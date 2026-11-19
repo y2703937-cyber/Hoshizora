@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<title>全日本观星指数 · Bortle≤4</title>
+<style>
+:root{--bg:#0b1020;--card:#141b30;--card2:#1b2440;--tx:#e8ecf8;--mu:#8d98b8;--ok:#5eead4;--mid:#fbbf24;--bad:#fb7185;--risk:#fb923c;--line:#26304f}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:radial-gradient(1200px 600px at 70% -10%,#1a2550 0,#0b1020 60%) fixed;color:var(--tx);font:15px/1.5 -apple-system,"Hiragino Sans","PingFang SC",sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+header{padding:14px 14px 4px}
+h1{font-size:20px;margin:0 0 2px}
+.sub{color:var(--mu);font-size:12px}
+.tabs{display:flex;gap:6px;padding:6px 14px;position:sticky;top:0;z-index:500;background:linear-gradient(#0b1020 70%,rgba(11,16,32,0))}
+.tabs button{flex:1;background:var(--card);border:1px solid var(--line);color:var(--mu);border-radius:12px;padding:8px 2px;font-size:13px}
+.tabs button.on{background:var(--ok);color:#052a25;border-color:var(--ok);font-weight:700}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:6px 14px}
+.seg{display:flex;background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.seg button{background:none;border:0;color:var(--mu);padding:7px 14px;font-size:14px}
+.seg button.on{background:var(--card2);color:var(--tx);font-weight:600}
+.btn{background:var(--card2);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:7px 12px;font-size:14px}
+.btn.sm{padding:3px 9px;font-size:12px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:2px 14px 8px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);color:var(--mu);border-radius:99px;padding:4px 12px;font-size:13px}
+.chip.on{background:var(--ok);color:#052a25;border-color:var(--ok);font-weight:600}
+select,input[type=search]{background:var(--card2);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:7px 8px;font-size:14px}
+input[type=search]{width:100%}
+#status{margin:2px 14px 8px;padding:8px 12px;border-radius:10px;background:var(--card);font-size:13px;color:var(--mu)}
+#status.err{color:#fecdd3;background:#3b1320}
+#status.new{color:#052a25;background:var(--ok)}
+.top3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 14px 8px}
+.t3{background:linear-gradient(160deg,#1f2b55,#141b30);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.t3 b{display:block;font-size:13px}.t3 span{font-size:11px;color:var(--mu)}.t3 em{font-style:normal;font-size:22px;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:0 14px 10px;padding:12px}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.nm b{font-size:16px}.nm div{font-size:12px;color:var(--mu)}
+.sc{font-size:30px;font-weight:800;line-height:1;text-align:right}.sc small{font-size:11px;font-weight:400;color:var(--mu);display:block}
+.strip{display:grid;gap:2px;margin:10px 0 2px}
+.cell{height:30px;border-radius:5px;position:relative;overflow:hidden}
+.cell i{position:absolute;left:0;right:0;bottom:0;background:var(--risk);opacity:.9}
+.cell.moon{box-shadow:inset 0 3px 0 #fde68a}.cell.twi{opacity:.45}
+.axis{display:grid;gap:2px;font-size:10px;color:var(--mu);text-align:center}
+.legend{font-size:11px;color:var(--mu);margin:2px 0 6px}
+.m{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.m span{background:var(--card2);border-radius:8px;padding:3px 8px;font-size:12px;color:var(--mu)}
+.m span b{color:var(--tx);font-weight:600}
+.note{margin-top:8px;font-size:13px}
+.warn{color:var(--risk)}
+.more{display:none;margin-top:10px;overflow-x:auto}
+.card.open .more{display:block}
+table{border-collapse:collapse;font-size:12px;min-width:100%}
+th,td{padding:4px 6px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--mu);font-weight:500}
+.lk{display:inline-block;margin-top:8px;font-size:12px;color:var(--ok);text-decoration:none;margin-right:12px}
+.tg{color:var(--mu);font-size:12px;margin-top:6px}
+.sec{padding:0 14px}
+.sec h3{font-size:15px;margin:10px 0 4px}
+.spotbar{margin:2px 14px 8px;padding:8px 12px;border-radius:10px;background:var(--card);font-size:13px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#map{height:380px;border-radius:14px;border:1px solid var(--line);margin:0 14px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 10px;font-size:13px;margin:6px 14px;color:var(--tx);background:var(--card);border-radius:12px;padding:10px 12px}
+.kv b{color:var(--mu);font-weight:500;white-space:nowrap}
+.chartbox{margin:6px 14px;background:var(--card);border-radius:14px;padding:8px 6px 6px;border:1px solid var(--line)}
+.chartbox svg{width:100%;height:auto;display:block}
+.chartbox text{fill:#cbd5f0;font-size:9.5px}
+#rowInfo{font-size:12.5px;margin:6px 8px 2px;color:var(--tx);min-height:18px}
+.golden{margin:0 8px 2px;font-size:12.5px;color:var(--ok)}
+.obj{background:var(--card);border:1px solid var(--line);border-radius:12px;margin:0 14px 8px;padding:8px 10px}
+.obj .oh{display:flex;gap:8px;align-items:baseline;justify-content:space-between}
+.obj .oh b{font-size:14.5px}
+.obj .ty{font-size:11px;color:var(--mu);margin-left:6px}
+.obj svg{width:100%;height:24px;display:block;margin:4px 0 2px}
+.obj .ot{font-size:12px;color:var(--mu)}
+.pin{background:none;border:1px solid var(--line);border-radius:8px;color:var(--mu);font-size:12px;padding:1px 7px}
+.pin.on{background:var(--ok);color:#052a25;border-color:var(--ok)}
+.lr{display:grid;grid-template-columns:58px 44px 1fr 1fr;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;margin:0 14px 2px;padding:8px 10px}
+.lr small{display:block;color:var(--mu);font-size:11px;line-height:1.3}
+.lr .mo{text-align:center;font-size:20px;line-height:1}
+.bar2{height:8px;background:var(--card2);border-radius:5px;overflow:hidden;margin-bottom:2px}
+.bar2 i{display:block;height:100%}
+.ltag{font-size:12px;color:var(--ok);margin:0 18px 8px;min-height:2px}
+table.heat{min-width:0;font-size:10px;border-collapse:separate;border-spacing:2px}
+table.heat th,table.heat td{border:0;padding:0}
+table.heat td.c{width:22px;height:22px;text-align:center;border-radius:4px;color:#fff;font-size:9.5px}
+table.heat td.n{text-align:left;padding-right:6px;font-size:11.5px;white-space:nowrap;color:var(--tx)}
+.heatwrap{overflow-x:auto;margin:6px 14px;background:var(--card);border-radius:12px;padding:8px}
+details.how{margin:0 14px 10px;background:var(--card);border-radius:12px;padding:8px 12px;font-size:12px;color:var(--mu)}
+details.how summary{color:var(--tx);font-size:13px}
+.ev{font-size:13px;margin-top:6px}.ev div{padding:5px 0;border-bottom:1px solid var(--line)}.ev small{display:block;color:var(--mu);font-size:12px}
+.foot{color:var(--mu);font-size:11px;padding:10px 14px 30px}
+.foot a{color:var(--mu)}
+</style>
+</head>
+<body>
+<header>
+  <h1>🌌 全日本观星指数 <span style="font-size:12px;color:var(--mu)">Bortle ≤ 4</span></h1>
+  <div class="sub" id="moon"></div>
+</header>
+<nav class="tabs" id="tabs"><button data-t="tonight" class="on">🌠 榜单</button><button data-t="map">🗺 选点</button><button data-t="sky">🔭 星体</button><button data-t="long">📅 14天</button></nav>
+<div class="bar">
+  <div class="seg" id="daySeg"><button data-d="0" class="on">今晚</button><button data-d="1">明晚</button></div>
+  <button class="btn" id="refresh">↻ 刷新</button>
+</div>
+<div id="status">正在连线气象厅模型…</div>
+
+<section id="tab-tonight">
+  <div class="bar" style="padding-top:0"><select id="sort"><option value="score">按综合分</option><option value="deep">按深空指数(含月光)</option><option value="mw">按银河指数</option><option value="clear">按晴朗概率</option><option value="clearing">按散去指数</option><option value="risk">按地形云风险(低→高)</option></select></div>
+  <div class="chips" id="regions"></div>
+  <div class="top3" id="top3"></div>
+  <div id="list"></div>
+</section>
+
+<section id="tab-map" style="display:none">
+  <div class="bar"><button class="btn" id="locBtn">📍 用我的位置</button><span class="tg" style="margin:0">或直接点地图任意位置；圆点=榜单里的暗空点</span></div>
+  <div id="map"></div>
+  <div class="tg" id="satinfo" style="margin:4px 14px"></div>
+  <div id="spotCard" style="margin-top:8px"></div>
+</section>
+
+<section id="tab-sky" style="display:none">
+  <div id="skyBar"></div>
+  <div id="skyKV"></div>
+  <div class="chartbox"><div id="golden" class="golden"></div><div id="chart"></div><div id="rowInfo">点一行看详情</div></div>
+  <div class="sec"><h3>星体列表（搜名字 / 点 📌 加到时间线）</h3></div>
+  <div class="sec"><input type="search" id="q" placeholder="搜：金星 / M31 / 昴 / Orion / すばる"></div>
+  <div class="chips" id="objChips" style="padding-top:8px"></div>
+  <div class="bar" style="padding-top:0"><select id="objSort"><option value="mag">按亮度</option><option value="alt">按最高高度</option><option value="time">按最佳时刻</option></select><label class="tg" style="margin:0"><input type="checkbox" id="onlyVis" checked> 只看今晚能看到的</label></div>
+  <div id="objList"></div>
+  <details class="how" id="evs"><summary>📅 接下来的天象（流星雨 / 无月夜 / 行星）</summary><div id="evBody" class="ev"></div></details>
+</section>
+
+<section id="tab-long" style="display:none">
+  <div id="longBar"></div>
+  <div id="longSum"></div>
+  <div id="longList"></div>
+  <div class="sec"><h3>🇯🇵 全国 14 晚总览</h3></div>
+  <div class="bar"><button class="btn" id="heatBtn">加载全国 14 日总览</button><span class="tg" style="margin:0" id="heatInfo">一次取 62 个点，流量大一点</span></div>
+  <div class="chips" id="regions2"></div>
+  <div id="heatBox"></div>
+</section>
+
+<details class="how"><summary>这些指数怎么算的？（点开看）</summary>
+<p><b>云</b>：气象厅 JMA 模型（MSM/GSM，经 Open-Meteo）为主，ECMWF 为辅，各出高/中/低云量，两家分歧大就拉低“晴朗概率”。</p>
+<p><b>地形云风险</b>（橙色柱）：用露点差、湿度、夜间降温趋势、风速风向估算——海边看“海风+近饱和”，山里看“湿空气爬坡”，盆地/湖边看“无风辐射雾”。风险会叠加到云量上。自选点的地形类型按海拔粗判，仅供参考。</p>
+<p><b>散去指数</b>：比较后半夜与前半夜的晴朗概率和两家模型的一致程度。</p>
+<p><b>透明度</b>：气溶胶光学厚度（CAMS）+ PM2.5 + 黄砂 + 湿度。<b>视宁度</b>：200–300hPa 高空急流风速 + 地面风。都是气象代理指标。</p>
+<p><b>深空 / 银河指数</b>：天气评分 × 天黑程度 × 月光；银河指数还看银河带高度。<b>流星数</b>：ZHR × 放射点高度 × 极限星等的粗算。</p>
+<p><b>14天预报</b>：前3天较可靠，4–7天看大势，8天以后只能当趋势（页面里会变淡）。云只是模型输出，越远越不准。</p>
+<p><b>光污染</b>：Bortle 为估计值，点“光污染地图”核对；自选点 Bortle 未知。</p></details>
+<div class="foot">数据：<a href="https://open-meteo.com/">Open-Meteo</a>（JMA / ECMWF 模型、CAMS 大气成分，CC BY 4.0）· 卫星云图：気象庁ひまわり · 底图：国土地理院 · 流星雨极大时刻参考国立天文台；太阳/月亮/行星位置为本页内置简化算法。指数为经验估算，出发前请再看现场实况。</div>
+
+<script>
+//<LOGIC>
+const ALL=[0,360];
+const MODELS=['jma_seamless','ecmwf_ifs025'];
+const MW={jma_seamless:0.6,ecmwf_ifs025:0.4};
+const TYPE_JP={coast:'海岸',island:'离岛',mountain:'山地',plateau:'高原',basin:'盆地/湖畔'};
+// [地区, 名称, lat, lon, 海拔m, 地形, Bortle估计, 海风来向范围]
+const SITES_RAW=[
+['北海道','美幌峠',43.72,144.08,525,'plateau',3],
+['北海道','摩周湖 第一展望台',43.58,144.52,855,'mountain',3],
+['北海道','阿寒湖',43.43,144.10,420,'basin',3],
+['北海道','知床 宇登呂',44.07,144.99,10,'coast',3,[300,60]],
+['北海道','宗谷岬',45.52,141.94,20,'coast',3,ALL],
+['北海道','利尻島',45.18,141.24,30,'island',2,ALL],
+['北海道','然別湖',43.28,143.19,810,'basin',2],
+['北海道','層雲峡・大雪山',43.72,142.95,650,'mountain',3],
+['北海道','支笏湖',42.77,141.35,250,'basin',4],
+['北海道','襟裳岬',41.93,143.25,60,'coast',3,ALL],
+['北海道','野付半島',43.58,145.28,5,'coast',3,ALL],
+['東北','八甲田 酸ヶ湯',40.65,140.85,900,'mountain',3],
+['東北','十和田湖',40.47,140.90,400,'basin',3],
+['東北','男鹿半島',39.93,139.72,50,'coast',3,[250,40]],
+['東北','田沢湖',39.72,140.66,250,'basin',3],
+['東北','早池峰・遠野',39.50,141.50,600,'mountain',3],
+['東北','三陸 久慈',40.19,141.78,30,'coast',3,[45,160]],
+['東北','月山',38.55,140.03,1500,'mountain',3],
+['東北','裏磐梯 檜原湖',37.67,140.08,830,'basin',3],
+['東北','檜枝岐・尾瀬口',36.95,139.38,940,'mountain',2],
+['東北','蔵王エコーライン',38.12,140.45,1100,'mountain',4],
+['関東','奥日光 戦場ヶ原',36.80,139.43,1400,'plateau',3],
+['関東','尾瀬 鳩待峠',36.87,139.22,1590,'mountain',2],
+['関東','那須高原',37.10,139.95,1000,'plateau',4],
+['関東','嬬恋 浅間牧場',36.45,138.55,1300,'plateau',3],
+['関東','神津島',34.21,139.13,100,'island',2,ALL],
+['関東','天城高原',34.88,139.00,1000,'plateau',4],
+['中部','野辺山高原',35.94,138.47,1350,'plateau',3],
+['中部','朝霧高原',35.42,138.58,900,'plateau',4],
+['中部','美ヶ原',36.21,138.10,2000,'mountain',3],
+['中部','霧ヶ峰・車山',36.10,138.20,1800,'plateau',3],
+['中部','阿智村 ヘブンスそのはら',35.45,137.73,1400,'mountain',3],
+['中部','乗鞍高原',36.10,137.55,1500,'mountain',2],
+['中部','上高地',36.25,137.64,1500,'basin',2],
+['中部','白馬',36.70,137.85,800,'mountain',3],
+['中部','妙高高原',36.90,138.15,900,'mountain',3],
+['中部','立山 室堂',36.58,137.60,2400,'mountain',2],
+['中部','能登 禄剛崎',37.52,137.30,20,'coast',3,ALL],
+['中部','白川郷',36.26,136.91,500,'basin',3],
+['中部','茶臼山高原',35.20,137.71,1100,'mountain',3],
+['近畿','大台ヶ原',34.18,136.10,1500,'mountain',2],
+['近畿','曽爾高原',34.50,136.15,700,'plateau',4],
+['近畿','高野山',34.21,135.58,800,'mountain',4],
+['近畿','熊野 本宮',33.84,135.77,100,'basin',3],
+['近畿','氷ノ山',35.36,134.52,1000,'mountain',3],
+['中国','大山',35.37,133.55,800,'mountain',3],
+['中国','隠岐 西ノ島',36.08,133.00,50,'island',2,ALL],
+['中国','美星町 井原',34.65,133.55,300,'basin',4],
+['中国','芸北 臥龍山',34.70,132.20,1000,'mountain',3],
+['中国','秋吉台',34.23,131.30,250,'plateau',4],
+['四国','剣山',33.85,134.10,1500,'mountain',2],
+['四国','四国カルスト',33.50,132.95,1300,'plateau',2],
+['四国','足摺岬',32.72,133.02,30,'coast',3,ALL],
+['九州','くじゅう',33.11,131.25,1300,'plateau',3],
+['九州','阿蘇 草千里',32.88,131.07,1150,'plateau',3],
+['九州','高千穂',32.71,131.30,400,'basin',3],
+['九州','五島 福江島',32.70,128.84,50,'island',3,ALL],
+['九州','屋久島',30.35,130.50,50,'island',2,ALL],
+['九州','奄美大島',28.38,129.50,50,'island',3,ALL],
+['離島','西表島',24.33,123.80,20,'island',1,ALL],
+['離島','波照間島',24.06,123.79,10,'island',1,ALL],
+['離島','小笠原 父島',27.09,142.20,30,'island',1,ALL]
+];
+const SITES=SITES_RAW.map((s,i)=>({id:i,region:s[0],name:s[1],lat:s[2],lon:s[3],elev:s[4],type:s[5],bortle:s[6],sea:s[7]||null}));
+
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const num=x=>(x===null||x===undefined||Number.isNaN(+x))?null:+x;
+const pad=n=>String(n).padStart(2,'0');
+function inSector(d,sec){ if(d==null||!sec) return false; const [a,b]=sec; if(a===0&&b===360) return true; return a<=b ? (d>=a&&d<=b) : (d>=a||d<=b); }
+function jstNow(){ const s=new Date().toLocaleString('sv-SE',{timeZone:'Asia/Tokyo'}); return {date:s.slice(0,10),hour:+s.slice(11,13),min:+s.slice(14,16)}; }
+function addDays(d,n){ const t=new Date(d+'T00:00:00Z'); t.setUTCDate(t.getUTCDate()+n); return t.toISOString().slice(0,10); }
+function dayOfYear(d){ const t=new Date(d+'T00:00:00Z'); return Math.floor((t-Date.UTC(t.getUTCFullYear(),0,0))/86400000); }
+
+// 一晚的小时窗口：日落+1.5h → 日出-1.5h（以 36°N 138°E 为全国代表）
+function nightWindow(offset,now){
+  const mk=base=>{
+    const doy=dayOfYear(base), dec=23.44*Math.PI/180*Math.sin(2*Math.PI*(doy-81)/365), lat=36*Math.PI/180;
+    const w0=Math.acos(clamp(-Math.tan(lat)*Math.tan(dec),-1,1))*180/Math.PI/15;
+    const noon=12+(135-138)/15;
+    let start=Math.ceil(noon+w0+1.5), end=Math.floor(noon-w0-1.5)+24;
+    if(end-start<4) end=start+4;
+    const times=[]; for(let k=start;k<=end;k++){ const dd=k>=24?addDays(base,1):base; times.push(dd+'T'+pad(k%24)+':00'); }
+    return {base,start,end,times};
+  };
+  let base=addDays(now.date,-1), w=mk(base);
+  // 昨晚还没结束(凌晨)就仍算“今晚”，否则取今天的夜
+  const endsToday=(w.end-24); const stillOn = now.hour < endsToday+1;
+  if(!stillOn){ base=now.date; w=mk(base); }
+  if(offset){ base=addDays(base,offset); w=mk(base); }
+  return w;
+}
+
+function ser(fc,name,m){
+  const h=fc.hourly; if(!h) return null;
+  if(h[name+'_'+m]) return h[name+'_'+m];
+  if(fc._models && fc._models.length===1 && fc._models[0]===m && h[name]) return h[name];
+  return null;
+}
+function firstSer(fc,name){ for(const m of MODELS){ const s=ser(fc,name,m); if(s && s.some(v=>v!=null)) return s; } return null; }
+
+// 云：高云对星空影响约一半
+const effCloud=(L,M,H)=>1-(1-L/100)*(1-M/100)*(1-0.5*H/100);
+
+function terrainRisk(site,T,Td,RH,ws,wd,spread3){
+  const sp=T-Td; let r=0; const why=[];
+  if(sp<=1){r+=45;why.push('露点差<1°C，空气近饱和');}
+  else if(sp<=2.5){r+=28;why.push('露点差<2.5°C');}
+  else if(sp<=4){r+=12;}
+  if(RH>=90) r+=15; else if(RH>=82) r+=8;
+  const dsp = spread3!=null ? spread3-sp : 0;
+  if(dsp>=2){r+=15;why.push('夜里降温，越来越潮');} else if(dsp>=1) r+=7;
+  const calm=ws<2;
+  if(site.type==='basin' && calm && sp<=3){r+=18;why.push('盆地/湖畔无风，易起辐射雾');}
+  if((site.type==='coast'||site.type==='island') && inSector(wd,site.sea) && sp<=4.5 && ws>=2){r+=22;why.push('海风送湿空气，海雾/低层云');}
+  if((site.type==='mountain'||site.type==='plateau') && RH>=80 && ws>=3 && sp<=3.5){r+=18;why.push('湿空气爬坡成云（地形云）');}
+  return {risk:Math.min(100,Math.round(r)),why};
+}
+function seeingScore(jet,ws){
+  const sSurf = ws<=3?0 : ws<=8?(ws-3)/5*20 : 20+Math.min(15,(ws-8)*3);
+  let sJet;
+  if(jet==null) sJet=35;
+  else if(jet<=20) sJet=0; else if(jet<=40) sJet=(jet-20)/20*35; else if(jet<=60) sJet=35+(jet-40)/20*30; else if(jet<=80) sJet=65+(jet-60)/20*20; else sJet=92;
+  return Math.round(clamp((100-sJet-sSurf)/100,0.05,1)*100);
+}
+function transScore(aod,pm25,dust,RH){
+  if(aod==null && pm25==null && dust==null) return Math.round(100-clamp((RH-55)/40)*45-15);
+  const a=aod==null?0.15:aod;
+  return Math.round(100 - clamp((a-0.05)/0.55)*55 - clamp((pm25||0)/40)*15 - clamp((dust||0)/200)*15 - clamp((RH-65)/30)*15);
+}
+function windScore(ws){
+  if(ws<=2) return 100; if(ws<=5) return 100-(ws-2)/3*25; if(ws<=8) return 75-(ws-5)/3*35; if(ws<=12) return 40-(ws-8)/4*30; return 5;
+}
+const pClear=adj=>1/(1+Math.exp((adj-0.35)/0.1));
+const label=(v,a,b,c)=> v>=a?'好':v>=b?'中':v>=c?'差':'很差';
+
+function computeSite(site,fc,aq,win,nowIso){
+  const h=fc&&fc.hourly; if(!h) return null;
+  const avail=MODELS.filter(m=>ser(fc,'cloud_cover_low',m)&&ser(fc,'cloud_cover_low',m).some(v=>v!=null));
+  if(!avail.length) return null;
+  const prim=avail[0];
+  const jetS=[['wind_speed_250hPa'],['wind_speed_300hPa']].map(([n])=>firstSer(fc,n)||(fc._jet&&fc._jet.hourly&&fc._jet.hourly[n])||null);
+  const rows=[];
+  for(const t of win.times){
+    const i=h.time.indexOf(t); if(i<0) continue;
+    const L={},M={},H={},eff={};
+    let wsum=0;
+    for(const m of avail){
+      const l=num(ser(fc,'cloud_cover_low',m)[i]), mi=num(ser(fc,'cloud_cover_mid',m)&&ser(fc,'cloud_cover_mid',m)[i]), hi=num(ser(fc,'cloud_cover_high',m)&&ser(fc,'cloud_cover_high',m)[i]);
+      if(l==null||mi==null||hi==null) continue;
+      L[m]=l;M[m]=mi;H[m]=hi;eff[m]=effCloud(l,mi,hi);
+    }
+    const ms=Object.keys(eff); if(!ms.length) continue;
+    const wt=ms.reduce((a,m)=>a+MW[m],0);
+    const avg=o=>ms.reduce((a,m)=>a+o[m]*MW[m],0)/wt;
+    const pm=ms.includes(prim)?prim:ms[0];
+    const g=(n,k=i)=>{const s=ser(fc,n,pm); return s?num(s[k]):null;};
+    const T=g('temperature_2m'),Td=g('dew_point_2m'),RH=g('relative_humidity_2m')??70,ws=g('wind_speed_10m')??2,wd=g('wind_direction_10m');
+    const T3=i>=3?g('temperature_2m',i-3):null, Td3=i>=3?g('dew_point_2m',i-3):null;
+    const tr=(T!=null&&Td!=null)?terrainRisk(site,T,Td,RH,ws,wd,(T3!=null&&Td3!=null)?T3-Td3:null):{risk:0,why:[]};
+    const adj={};let P=0;
+    for(const m of ms){ adj[m]=eff[m]+(1-eff[m])*(tr.risk/100)*0.55; P+=pClear(adj[m])*MW[m]; }
+    P/=wt;
+    const adjC=avg(adj);
+    // 高空急流
+    let jet=null; const js=jetS.map(s=>s?num(s[i]):null).filter(v=>v!=null); if(js.length) jet=js.reduce((a,b)=>a+b,0)/js.length;
+    // 气溶胶
+    let aod=null,pm25=null,dust=null;
+    if(aq&&aq.hourly&&aq.hourly.time){ const j=aq.hourly.time.indexOf(t); if(j>=0){ aod=num(aq.hourly.aerosol_optical_depth&&aq.hourly.aerosol_optical_depth[j]); pm25=num(aq.hourly.pm2_5&&aq.hourly.pm2_5[j]); dust=num(aq.hourly.dust&&aq.hourly.dust[j]); } }
+    const tra=transScore(aod,pm25,dust,RH), see=seeingScore(jet,ws), win_=Math.round(windScore(ws));
+    const quality=0.45*tra+0.25*see+0.30*win_;
+    const base=Math.pow(1-adjC,1.3)*100;
+    const score=Math.round(base*(0.55+0.45*quality/100));
+    rows.push({t,hour:+t.slice(11,13),L:avg(L),M:avg(M),H:avg(H),risk:tr.risk,why:tr.why,P,adjC,ws,wd,jet,tra,see,wnd:win_,score,spread:T!=null&&Td!=null?T-Td:null,dis:ms.length>1?Math.abs(adj[ms[0]]-adj[ms[1]]):0,past:t<nowIso});
+  }
+  if(rows.length<3) return null;
+  const mean=(a,f)=>a.reduce((s,r)=>s+f(r),0)/a.length;
+  let rem=rows.filter(r=>!r.past); if(rem.length<3) rem=rows;
+  const half=Math.ceil(rem.length/2), P1=mean(rem.slice(0,half),r=>r.P), P2=mean(rem.slice(half),r=>r.P);
+  const clearing=Math.round(100*(0.5*P2+0.5*clamp(0.5+(P2-P1))));
+  let state; if(P1>=0.6&&P2>=0.6) state='stable'; else if(P1<0.35&&P2<0.35) state='cloudy'; else if(P2<P1-0.2) state='worse'; else state='clearing';
+  let clearAt=null; for(let k=0;k<rows.length-1;k++){ if(rows[k].P>=0.55&&rows[k+1].P>=0.55&&!rows[k].past){ clearAt=rows[k].hour; break; } }
+  const maxRisk=Math.max(...rows.map(r=>r.risk)), peak=rows.find(r=>r.risk===maxRisk);
+  const early=mean(rows.slice(0,2),r=>r.risk), mid=Math.max(...rows.slice(1,-1).map(r=>r.risk));
+  const surge = maxRisk>=45 && mid>early+25;
+  const whyCount={}; rows.filter(r=>r.risk>=40).forEach(r=>r.why.forEach(w=>whyCount[w]=(whyCount[w]||0)+1));
+  const whyTop=Object.entries(whyCount).sort((a,b)=>b[1]-a[1]).slice(0,2).map(e=>e[0]);
+  const core=rows.length>=7?rows.slice(1,-1):rows;
+  return {site,rows,
+    score:Math.round(mean(core,r=>r.score)), pclear:Math.round(100*mean(core,r=>r.P)), clearing, state, clearAt,
+    L:Math.round(mean(core,r=>r.L)),M:Math.round(mean(core,r=>r.M)),H:Math.round(mean(core,r=>r.H)),
+    maxRisk, peakHour:peak.hour, surge, whyTop,
+    ws:mean(core,r=>r.ws), wsMax:Math.max(...core.map(r=>r.ws)), tra:Math.round(mean(core,r=>r.tra)), see:Math.round(mean(core,r=>r.see)),
+    jet:(()=>{const v=core.map(r=>r.jet).filter(x=>x!=null); return v.length?mean(v.map(x=>({jet:x})),r=>r.jet):null;})(),
+    dis:mean(core,r=>r.dis)};
+}
+function moonInfo(dateStr){
+  const t=Date.parse(dateStr+'T15:00:00Z'); // 当晚(JST 0时)
+  const age=(((t-Date.UTC(2000,0,6,18,14))/86400000)%29.530588+29.530588)%29.530588;
+  const ill=Math.round((1-Math.cos(2*Math.PI*age/29.530588))/2*100);
+  return {age,ill};
+}
+//</LOGIC>
+//<ASTRO>
+// ========== 天文计算（离线，纯本地）==========
+const D2R=Math.PI/180,R2D=180/Math.PI;
+const nrm=a=>((a%360)+360)%360;
+const sd=a=>Math.sin(a*D2R), cd=a=>Math.cos(a*D2R);
+const JSTMS=9*3600000, DAYMS=86400000;
+const jdOf=ms=>ms/DAYMS+2440587.5;
+const msOfJst=(date,hh,mm=0)=>Date.parse(date+'T00:00:00Z')-JSTMS+(hh*60+mm)*60000;
+const jstIso=ms=>new Date(ms+JSTMS).toISOString();
+const hmOf=ms=>jstIso(ms).slice(11,16);
+const mdOf=ms=>jstIso(ms).slice(5,10).replace('-','/');
+const dateOf=ms=>jstIso(ms).slice(0,10);
+
+function eclToEq(lon,lat,eps){
+  const x=cd(lat)*cd(lon), y=cd(lat)*sd(lon)*cd(eps)-sd(lat)*sd(eps), z=cd(lat)*sd(lon)*sd(eps)+sd(lat)*cd(eps);
+  return {ra:nrm(Math.atan2(y,x)*R2D),dec:Math.asin(Math.max(-1,Math.min(1,z)))*R2D};
+}
+function sunPos(jd){
+  const n=jd-2451545.0, L=nrm(280.460+0.9856474*n), g=nrm(357.528+0.9856003*n);
+  const lon=nrm(L+1.915*sd(g)+0.020*sd(2*g)), eps=23.439-0.0000004*n, R=1.00014-0.01671*cd(g)-0.00014*cd(2*g);
+  return Object.assign({lon,eps,R},eclToEq(lon,0,eps));
+}
+function moonPos(jd){
+  const T=(jd-2451545.0)/36525;
+  const lon=nrm(218.32+481267.881*T+6.29*sd(135.0+477198.87*T)-1.27*sd(259.3-413335.36*T)+0.66*sd(235.7+890534.22*T)+0.21*sd(269.9+954397.74*T)-0.19*sd(357.5+35999.05*T)-0.11*sd(186.5+966404.03*T));
+  const lat=5.13*sd(93.3+483202.02*T)+0.28*sd(228.2+960400.89*T)-0.28*sd(318.3+6003.15*T)-0.17*sd(217.6-407332.21*T);
+  const par=0.9508+0.0518*cd(135.0+477198.87*T)+0.0095*cd(259.3-413335.36*T)+0.0078*cd(235.7+890534.22*T)+0.0028*cd(269.9+954397.74*T);
+  const eps=23.439-0.013*T;
+  return Object.assign({lon,lat,par,eps},eclToEq(lon,lat,eps));
+}
+const lstDeg=(jd,lonE)=>nrm(280.46061837+360.98564736629*(jd-2451545.0)+lonE);
+function altOf(ra,dec,jd,lat,lon){
+  const H=lstDeg(jd,lon)-ra;
+  return Math.asin(Math.max(-1,Math.min(1,sd(lat)*sd(dec)+cd(lat)*cd(dec)*cd(H))))*R2D;
+}
+function moonIll(sun,moon){ const c=cd(moon.lat)*cd(moon.lon-sun.lon); return (1-c)/2; }
+
+// ---- 行星（Schlyter 简化轨道根数，精度约 1–2 角分）----
+const PL={
+ mercury:{N:[48.3313,3.24587e-5],i:[7.0047,5.00e-8],w:[29.1241,1.01444e-5],a:0.387098,e:[0.205635,5.59e-10],M:[168.6562,4.0923344368],cn:'水星',mg:(rR,f)=>-0.36+5*Math.log10(rR)+0.027*f+2.2e-13*Math.pow(f,6)},
+ venus:{N:[76.6799,2.46590e-5],i:[3.3946,2.75e-8],w:[54.8910,1.38374e-5],a:0.723330,e:[0.006773,-1.302e-9],M:[48.0052,1.6021302244],cn:'金星',mg:(rR,f)=>-4.34+5*Math.log10(rR)+0.013*f+4.2e-7*Math.pow(f,3)},
+ mars:{N:[49.5574,2.11081e-5],i:[1.8497,-1.78e-8],w:[286.5016,2.92961e-5],a:1.523688,e:[0.093405,2.516e-9],M:[18.6021,0.5240207766],cn:'火星',mg:(rR,f)=>-1.51+5*Math.log10(rR)+0.016*f},
+ jupiter:{N:[100.4542,2.76854e-5],i:[1.3030,-1.557e-7],w:[273.8777,1.64505e-5],a:5.20256,e:[0.048498,4.469e-9],M:[19.8950,0.0830853001],cn:'木星',mg:(rR,f)=>-9.25+5*Math.log10(rR)+0.014*f},
+ saturn:{N:[113.6634,2.38980e-5],i:[2.4886,-1.081e-7],w:[339.3939,2.97661e-5],a:9.55475,e:[0.055546,-9.499e-9],M:[316.9670,0.0334442282],cn:'土星',mg:(rR,f)=>-9.0+5*Math.log10(rR)+0.044*f}
+};
+function planetHelio(name,d){
+  const p=PL[name], N=p.N[0]+p.N[1]*d, i=p.i[0]+p.i[1]*d, w=p.w[0]+p.w[1]*d, e=p.e[0]+p.e[1]*d, M=nrm(p.M[0]+p.M[1]*d);
+  let E=M+R2D*e*sd(M)*(1+e*cd(M));
+  for(let k=0;k<8;k++) E=E-(E-R2D*e*sd(E)-M)/(1-e*cd(E));
+  const xv=p.a*(cd(E)-e), yv=p.a*Math.sqrt(1-e*e)*sd(E), v=nrm(Math.atan2(yv,xv)*R2D), r=Math.hypot(xv,yv), vw=v+w;
+  let x=r*(cd(N)*cd(vw)-sd(N)*sd(vw)*cd(i)), y=r*(sd(N)*cd(vw)+cd(N)*sd(vw)*cd(i)), z=r*sd(vw)*sd(i);
+  if(name==='jupiter'||name==='saturn'){
+    const Mj=nrm(19.8950+0.0830853001*d), Ms=nrm(316.9670+0.0334442282*d);
+    let lon=Math.atan2(y,x)*R2D, lat=Math.atan2(z,Math.hypot(x,y))*R2D;
+    if(name==='jupiter'){
+      lon+=-0.332*sd(2*Mj-5*Ms-67.6)-0.056*sd(2*Mj-2*Ms+21)+0.042*sd(3*Mj-5*Ms+21)-0.036*sd(Mj-2*Ms)+0.022*cd(Mj-Ms)+0.023*sd(2*Mj-3*Ms+52)-0.016*sd(Mj-5*Ms-69);
+    } else {
+      lon+=0.812*sd(2*Mj-5*Ms-67.6)-0.229*cd(2*Mj-4*Ms-2)+0.119*sd(Mj-2*Ms-3)+0.046*sd(2*Mj-6*Ms-69)+0.014*sd(Mj-3*Ms+32);
+      lat+=-0.020*cd(2*Mj-4*Ms-2)+0.018*sd(2*Mj-6*Ms-49);
+    }
+    x=r*cd(lon)*cd(lat); y=r*sd(lon)*cd(lat); z=r*sd(lat);
+  }
+  return {x,y,z,r};
+}
+function planetsAt(jd){
+  const d=jd-2451543.5, s=sunPos(jd), xs=s.R*cd(s.lon), ys=s.R*sd(s.lon), out={};
+  for(const name in PL){
+    const h=planetHelio(name,d), xg=h.x+xs, yg=h.y+ys, zg=h.z;
+    const lon=nrm(Math.atan2(yg,xg)*R2D), lat=Math.atan2(zg,Math.hypot(xg,yg))*R2D, R=Math.sqrt(xg*xg+yg*yg+zg*zg);
+    const eq=eclToEq(lon,lat,s.eps), r=h.r, Rs=s.R;
+    const cl=v=>Math.max(-1,Math.min(1,v));
+    const fv=Math.acos(cl((r*r+R*R-Rs*Rs)/(2*r*R)))*R2D, el=Math.acos(cl((R*R+Rs*Rs-r*r)/(2*R*Rs)))*R2D;
+    const sign=(((lon-s.lon+540)%360)-180)>=0?1:-1;
+    out[name]={name,cn:PL[name].cn,lon,lat,R,r,ra:eq.ra,dec:eq.dec,mag:PL[name].mg(r*R,fv),el:el*sign,fv};
+  }
+  return out;
+}
+// ---- 银河：银道 → 赤道（J2000）----
+function galToEq(l,b){
+  const aG=192.85948, dG=27.12825, lN=122.93192;
+  const sinDec=sd(b)*sd(dG)+cd(b)*cd(dG)*cd(lN-l);
+  const dec=Math.asin(sinDec)*R2D;
+  const ra=nrm(aG+Math.atan2(cd(b)*sd(lN-l),sd(b)*cd(dG)-cd(b)*sd(dG)*cd(lN-l))*R2D);
+  return {ra,dec};
+}
+const GC=galToEq(0,0);
+const MWPTS=[]; for(let l=0;l<360;l+=15) MWPTS.push(Object.assign({l},galToEq(l,0)));
+function mwName(l){ if(l>=345||l<30) return '银心·人马-天蝎'; if(l<60) return '天鹰-盾牌'; if(l<100) return '天鹅座'; if(l<130) return '仙王-仙后'; if(l<160) return '仙后-英仙'; if(l<190) return '御夫座'; if(l<215) return '猎户-双子'; if(l<250) return '麒麟-大犬'; return '南天（日本多半看不到）'; }
+// ---- 深空天体 ----
+const DSO=[
+ ['M31 仙女座星系',10.685,41.269],['M33 三角座星系',23.46,30.66],['英仙座双重星团',35.3,57.13],['M45 昴星团',56.75,24.12],
+ ['M42 猎户座大星云',83.82,-5.39],['马头星云一带',85.25,-2.46],['玫瑰星云',98.0,4.95],['M44 蜂巢星团',130.1,19.67],
+ ['M51 涡状星系',202.47,47.2],['M81/M82 星系',148.9,69.07],['M13 武仙座球状星团',250.42,36.46],['M8 礁湖星云',270.9,-24.38],
+ ['M57 环状星云',283.4,33.03],['M27 哑铃星云',299.9,22.72],['NGC7000 北美洲星云',314.7,44.3],['M1 蟹状星云',83.63,22.01]
+];
+// ---- 流星雨 ----
+const SHOWERS=[
+ {id:'QUA',name:'しぶんぎ座流星群',cn:'象限仪座',zhr:120,r:2.1,w:0.6,ra:230.1,dec:49.5,md:'01-04',over:{2027:'2027-01-04T12:00'},note:'国立天文台预计2027年约15–20个/时，年际波动大'},
+ {id:'LYR',name:'こと座流星群',cn:'天琴座',zhr:18,r:2.1,w:1.2,ra:271.4,dec:33.3,md:'04-22'},
+ {id:'ETA',name:'みずがめ座η流星群',cn:'宝瓶座η',zhr:50,r:2.4,w:3,ra:338,dec:-1,md:'05-06'},
+ {id:'SDA',name:'みずがめ座δ南流星群',cn:'宝瓶座南δ',zhr:25,r:3.2,w:6,ra:339,dec:-16.4,md:'07-30'},
+ {id:'PER',name:'ペルセウス座流星群',cn:'英仙座',zhr:100,r:2.2,w:2.5,ra:48,dec:58,md:'08-13'},
+ {id:'DRA',name:'10月りゅう座流星群',cn:'天龙座',zhr:10,r:2.6,w:0.4,ra:262,dec:54,md:'10-08'},
+ {id:'ORI',name:'オリオン座流星群',cn:'猎户座',zhr:20,r:2.5,w:3,ra:95,dec:16,md:'10-21'},
+ {id:'TAU',name:'おうし座流星群',cn:'金牛座',zhr:5,r:2.3,w:8,ra:52,dec:14,md:'11-12'},
+ {id:'LEO',name:'しし座流星群',cn:'狮子座',zhr:15,r:2.5,w:1.2,ra:152,dec:22,md:'11-17'},
+ {id:'GEM',name:'ふたご座流星群',cn:'双子座',zhr:120,r:2.6,w:2.5,ra:112,dec:33,md:'12-14',over:{2026:'2026-12-14T23:00'},note:'国立天文台：2026年14日夜月落后无月光，条件极佳'},
+ {id:'URS',name:'こぐま座流星群',cn:'小熊座',zhr:10,r:3.0,w:1.2,ra:217,dec:76,md:'12-22'}
+];
+function showerPeakMs(sh,year){
+  const t=sh.over&&sh.over[year]; if(t) return msOfJst(t.slice(0,10),+t.slice(11,13),+t.slice(14,16));
+  return msOfJst(year+'-'+sh.md,22);
+}
+function nightMidMs(base){ return msOfJst(addDays(base,1),1); }
+function activeShowers(base){
+  const mid=nightMidMs(base), y=+base.slice(0,4), out=[];
+  for(const sh of SHOWERS){
+    let best=null;
+    for(const yy of [y-1,y,y+1]){ const d=Math.abs(mid-showerPeakMs(sh,yy))/DAYMS; if(best==null||d<best) best=d; }
+    const fac=Math.exp(-best/sh.w);
+    if(sh.zhr*fac>=6) out.push({sh,fac});
+  }
+  return out;
+}
+// ---- 一晚的星历（全国共用，15:00→次日08:00，每10分钟）----
+const EPH={};
+function ephemFor(base){
+  if(EPH[base]) return EPH[base];
+  const t0=msOfJst(base,15), n=17*6+1, arr=[];
+  for(let k=0;k<n;k++){ const ms=t0+k*600000, jd=jdOf(ms); arr.push({ms,jd,sun:sunPos(jd),moon:moonPos(jd),pl:planetsAt(jd)}); }
+  const mid=arr[Math.round((msOfJst(addDays(base,1),0)-t0)/600000)];
+  return EPH[base]={t0,arr,ill:moonIll(mid.sun,mid.moon),moonAge:nrm(mid.moon.lon-mid.sun.lon)/360*29.530588};
+}
+function crossings(S,key,thr){ // 返回 [{ms,dir}]  dir=+1 上升穿过 / -1 下降穿过
+  const out=[]; for(let k=1;k<S.length;k++){ const a=S[k-1][key]-thr,b=S[k][key]-thr; if((a<0&&b>=0)||(a>=0&&b<0)){ out.push({ms:S[k-1].ms+(0-a)/(b-a)*(S[k].ms-S[k-1].ms),dir:b>a?1:-1}); } }
+  return out;
+}
+function segments(S,pred){ // 连续满足条件的区段 [{a,b,hours}]
+  const segs=[]; let a=null;
+  for(let k=0;k<S.length;k++){
+    if(pred(S[k])){ if(a==null) a=S[k].ms; }
+    else if(a!=null){ segs.push({a,b:S[k-1].ms+600000}); a=null; }
+  }
+  if(a!=null) segs.push({a,b:S[S.length-1].ms});
+  return segs.map(s=>Object.assign(s,{hours:(s.b-s.a)/3600000}));
+}
+function siteAstro(site,E){
+  const {lat,lon}=site;
+  const S=E.arr.map(e=>{
+    const sunAlt=altOf(e.sun.ra,e.sun.dec,e.jd,lat,lon);
+    let mAlt=altOf(e.moon.ra,e.moon.dec,e.jd,lat,lon); mAlt-=e.moon.par*cd(mAlt);
+    const o={ms:e.ms,jd:e.jd,sunAlt,moonAlt:mAlt,gc:altOf(GC.ra,GC.dec,e.jd,lat,lon)};
+    for(const n in e.pl) o['p_'+n]=altOf(e.pl[n].ra,e.pl[n].dec,e.jd,lat,lon);
+    return o;
+  });
+  const first=(arr,dir,after=0)=>{ const c=arr.find(x=>x.dir===dir&&x.ms>=after); return c?c.ms:null; };
+  const sc=crossings(S,'sunAlt',-0.833), civ=crossings(S,'sunAlt',-6), nau=crossings(S,'sunAlt',-12), ast=crossings(S,'sunAlt',-18);
+  const sunset=first(sc,-1), sunrise=first(sc,1,sunset||0);
+  const t={sunset,sunrise,civilEnd:first(civ,-1),astroEnd:first(ast,-1),astroStart:first(ast,1,first(ast,-1)||0),moonrise:null,moonset:null};
+  const mc=crossings(S,'moonAlt',-0.833);
+  // 只关心日落到日出之间
+  const lo=sunset||S[0].ms, hi=sunrise||S[S.length-1].ms;
+  t.moonrise=(mc.find(x=>x.dir===1&&x.ms>=lo&&x.ms<=hi)||{}).ms||null;
+  t.moonset=(mc.find(x=>x.dir===-1&&x.ms>=lo&&x.ms<=hi)||{}).ms||null;
+  const moonUpAtSunset=S.find(s=>s.ms>=lo).moonAlt>-0.833;
+  const dark=segments(S,s=>s.sunAlt<-18), free=segments(S,s=>s.sunAlt<-18&&s.moonAlt<-0.833).sort((x,y)=>y.hours-x.hours);
+  const gcw=segments(S,s=>s.gc>=8&&s.sunAlt<-12).sort((x,y)=>y.hours-x.hours);
+  let gcBest=null; S.forEach(s=>{ if(s.sunAlt<-12&&(gcBest==null||s.gc>gcBest.gc)) gcBest=s; });
+  const gcFree=segments(S,s=>s.gc>=8&&s.sunAlt<-18&&s.moonAlt<-0.833).sort((x,y)=>y.hours-x.hours);
+  // 行星
+  const planets=[];
+  for(const n in PL){
+    let best=null; S.forEach(s=>{ if(s.sunAlt<-12&&s['p_'+n]>=8&&(best==null||s['p_'+n]>best['p_'+n])) best=s; });
+    let twi=false;
+    if(!best){ S.forEach(s=>{ if(s.sunAlt<-6&&s['p_'+n]>=8&&(best==null||s['p_'+n]>best['p_'+n])) best=s; }); twi=true; }
+    if(!best) continue;
+    const vis=segments(S,s=>s.sunAlt<-6&&s['p_'+n]>=8)[0];
+    const idx=Math.round((best.ms-E.t0)/600000), pl=E.arr[idx].pl[n];
+    planets.push({n,cn:PL[n].cn,alt:best['p_'+n],ms:best.ms,mag:pl.mag,el:pl.el,from:vis.a,to:vis.b,twilightOnly:twi});
+  }
+  planets.sort((a,b)=>b.mag===a.mag?0:a.mag-b.mag);
+  // 深空目标
+  const targets=[]; const darkS=S.filter(s=>s.sunAlt<-18);
+  for(const [name,ra,dec] of DSO){
+    let b=null; darkS.forEach(s=>{ const a=altOf(ra,dec,s.jd,lat,lon); if(b==null||a>b.alt) b={alt:a,ms:s.ms,moon:s.moonAlt}; });
+    if(b&&b.alt>=40) targets.push({name,alt:b.alt,ms:b.ms,moonUp:b.moon>-0.833});
+  }
+  targets.sort((a,b)=>b.alt-a.alt);
+  const at=ms=>S[Math.max(0,Math.min(S.length-1,Math.round((ms-E.t0)/600000)))];
+  const planeAlt=ms=>{ const s=at(ms); let b={alt:-90,l:0}; for(const p of MWPTS){ const a=altOf(p.ra,p.dec,s.jd,lat,lon); if(a>b.alt) b={alt:a,l:p.l}; } return b; };
+  return {S,t,moonUpAtSunset,darkHours:dark.reduce((a,x)=>a+x.hours,0),free:free[0]||null,gcw:gcw[0]||null,gcFree:gcFree[0]||null,gcBest:gcBest&&{alt:gcBest.gc,ms:gcBest.ms},planets,targets,ill:E.ill,age:E.moonAge,at,planeAlt};
+}
+const moonGlow=(ill,alt)=> alt<=-0.833?0 : ill*Math.min(1,(alt+0.833)/8)*(0.4+0.6*Math.min(1,alt/30));
+const darkF=sun=> sun<=-18?1 : sun>=-6?0 : Math.pow((-sun-6)/12,1.5);
+const NELM={1:7.6,2:7.1,3:6.6,4:6.2};
+
+function decorate(r,E,act){
+  const A=siteAstro(r.site,E); r.ast=A;
+  const showers=act||[];
+  for(const x of r.rows){
+    const ms=msOfJst(x.t.slice(0,10),+x.t.slice(11,13)), s=A.at(ms);
+    x.sunAlt=s.sunAlt; x.moonAlt=s.moonAlt; x.gc=s.gc;
+    x.glow=moonGlow(A.ill,s.moonAlt); x.df=darkF(s.sunAlt); x.dark=x.df*(1-0.9*x.glow);
+    x.deep=Math.round(x.score*x.dark);
+    const pl=A.planeAlt(ms); x.plane=pl.alt; x.planeL=pl.l;
+    x.mw=Math.round(x.score*x.dark*Math.max(0,Math.min(1,(pl.alt-10)/45)));
+    x.met=null;
+    for(const a of showers){
+      const alt=altOf(a.sh.ra,a.sh.dec,s.jd,r.site.lat,r.site.lon); if(alt<=3) continue;
+      const lm=(NELM[r.site.bortle]||6.2)-1.3-2.2*x.glow-(1-x.df)*2.5;
+      const rate=a.sh.zhr*a.fac*Math.sin(alt*D2R)*Math.pow(a.sh.r,lm-6.5);
+      if(rate>0&&(x.met==null||rate>x.met.rate)) x.met={sh:a.sh,rate,alt,rateW:rate*(1-x.adjC)};
+    }
+  }
+  const core=r.rows.length>=7?r.rows.slice(1,-1):r.rows, mean=f=>core.reduce((a,x)=>a+f(x),0)/core.length;
+  r.deep=Math.round(mean(x=>x.deep)); r.mwIdx=Math.round(mean(x=>x.mw));
+  let bm=null; r.rows.forEach(x=>{ if(x.met&&(bm==null||x.met.rateW>bm.met.rateW)) bm={met:x.met,hour:x.hour}; });
+  r.metBest=bm&&bm.met.rate>=2?{name:bm.met.sh.cn,jp:bm.met.sh.name,rate:Math.round(bm.met.rate),rateW:Math.round(bm.met.rateW),hour:bm.hour,alt:Math.round(bm.met.alt),note:bm.met.sh.note||''}:null;
+  return r;
+}
+
+// ---- 月相 / 事件 ----
+function elongAt(ms){ const jd=jdOf(ms); return nrm(moonPos(jd).lon-sunPos(jd).lon); }
+function moonPhases(fromMs,days){
+  const out=[], names=['新月','上弦','满月','下弦'], step=6*3600000;
+  for(let t=fromMs;t<fromMs+days*DAYMS;t+=step){
+    for(let q=0;q<4;q++){
+      const g=ms=>((elongAt(ms)-q*90+540)%360)-180, a=g(t), b=g(t+step);
+      if(a<0&&b>=0&&b-a<90){ let lo=t,hi=t+step; for(let k=0;k<30;k++){ const m=(lo+hi)/2; if(g(m)<0) lo=m; else hi=m; } out.push({ms:(lo+hi)/2,q,name:names[q]}); }
+    }
+  }
+  return out.sort((a,b)=>a.ms-b.ms);
+}
+const angSep=(ra1,d1,ra2,d2)=>Math.acos(Math.max(-1,Math.min(1,sd(d1)*sd(d2)+cd(d1)*cd(d2)*cd(ra1-ra2))))*R2D;
+function upcomingEvents(nowMs,ref,days=120){
+  const ev=[], end=nowMs+days*DAYMS;
+  // 月相
+  moonPhases(nowMs,days).filter(p=>p.q===0||p.q===2).forEach(p=>ev.push({ms:p.ms,icon:p.q===0?'🌑':'🌕',title:p.name,note:p.q===0?'前后3晚最适合拍银河/暗弱天体':'月光强，适合拍月亮，别拍银河'}));
+  // 流星雨极大
+  const y=+dateOf(nowMs).slice(0,4);
+  for(const sh of SHOWERS) for(const yy of [y,y+1]){
+    const pk=showerPeakMs(sh,yy); if(pk<nowMs-6*3600000||pk>end) continue;
+    const d0=dateOf(pk-6*3600000), cands=[addDays(d0,-1),d0];
+    const base=cands.sort((a,b)=>Math.abs(nightMidMs(a)-pk)-Math.abs(nightMidMs(b)-pk))[0];
+    const A=siteAstro(ref,ephemFor(base)), fh=A.free?A.free.hours:0;
+    ev.push({ms:pk,icon:'☄️',title:sh.name+'（'+sh.cn+'）极大',note:'ZHR≈'+sh.zhr+'；该夜无月暗夜约'+fh.toFixed(1)+'小时，月亮'+Math.round(A.ill*100)+'%'+(sh.note?'；'+sh.note:'')});
+  }
+  // 行星：冲 / 大距 / 月-行星接近 / 行星合
+  const step=6*3600000, prev={}, series=[];
+  for(let t=nowMs;t<=nowMs+Math.max(days,420)*DAYMS;t+=step){ const jd=jdOf(t), p=planetsAt(jd), s=sunPos(jd); series.push({t,p,s,m:moonPos(jd)}); }
+  for(let k=1;k<series.length-1;k++){
+    const a=series[k-1],b=series[k],c=series[k+1];
+    for(const n of ['mars','jupiter','saturn']){
+      const ha=nrm(a.p[n].lon-a.s.lon), hb=nrm(b.p[n].lon-b.s.lon);
+      if(ha>=180&&hb<180&&ha<270) ev.push({ms:b.t,icon:'🪐',title:PL[n].cn+'冲（整晚可见、最亮）',note:'亮度≈'+b.p[n].mag.toFixed(1)+' 等'});
+    }
+    for(const n of ['mercury','venus']){
+      const ea=Math.abs(a.p[n].el),eb=Math.abs(b.p[n].el),ec=Math.abs(c.p[n].el);
+      if(eb>ea&&eb>=ec&&eb>(n==='venus'?30:15)) ev.push({ms:b.t,icon:n==='venus'?'💫':'☿',title:PL[n].cn+(b.p[n].el>0?'东大距（傍晚西空）':'西大距（黎明东空）'),note:'与太阳相距约'+Math.round(eb)+'°'});
+    }
+    if(b.t<=end&&k%1===0){
+      for(const n in PL){
+        const sa=angSep(a.m.ra,a.m.dec,a.p[n].ra,a.p[n].dec), sb=angSep(b.m.ra,b.m.dec,b.p[n].ra,b.p[n].dec), sc=angSep(c.m.ra,c.m.dec,c.p[n].ra,c.p[n].dec);
+        if(sb<sa&&sb<=sc&&sb<5){
+          const jd=jdOf(b.t), al=altOf(b.p[n].ra,b.p[n].dec,jd,ref.lat,ref.lon), sa2=altOf(b.s.ra,b.s.dec,jd,ref.lat,ref.lon);
+          if(al>8&&sa2<-6) ev.push({ms:b.t,icon:'🌙',title:'月亮与'+PL[n].cn+'接近',note:'相距约'+sb.toFixed(1)+'°，那时日本夜空可见'});
+        }
+      }
+      const names=Object.keys(PL);
+      for(let i=0;i<names.length;i++) for(let j=i+1;j<names.length;j++){
+        const A_=names[i],B_=names[j];
+        const sa=angSep(a.p[A_].ra,a.p[A_].dec,a.p[B_].ra,a.p[B_].dec), sb=angSep(b.p[A_].ra,b.p[A_].dec,b.p[B_].ra,b.p[B_].dec), sc=angSep(c.p[A_].ra,c.p[A_].dec,c.p[B_].ra,c.p[B_].dec);
+        if(sb<sa&&sb<=sc&&sb<2){
+          const jd=jdOf(b.t); if(Math.abs(b.p[A_].el)>25&&Math.abs(b.p[B_].el)>25) ev.push({ms:b.t,icon:'✨',title:PL[A_].cn+'与'+PL[B_].cn+'靠近',note:'相距约'+sb.toFixed(1)+'°'});
+        }
+      }
+    }
+  }
+  return ev.filter(e=>e.ms>=nowMs-6*3600000&&e.ms<=nowMs+(e.icon==='🪐'||e.icon==='💫'||e.icon==='☿'?420:days)*DAYMS).sort((a,b)=>a.ms-b.ms);
+}
+//</ASTRO>
+//<CATALOG>
+// ========== 星体目录 + 一晚的可见性表 ==========
+const TYPE_CN={planet:'行星',moon:'月亮',star:'亮星',cluster:'星团',nebula:'星云',galaxy:'星系',mw:'银河',meteor:'流星雨'};
+const PCOL={mercury:'#cbd5e1',venus:'#fef3c7',mars:'#fb7185',jupiter:'#fdba74',saturn:'#fcd34d'};
+const PINFO={mercury:['Mercury','水星'],venus:['Venus','金星'],mars:['Mars','火星'],jupiter:['Jupiter','木星'],saturn:['Saturn','土星']};
+// [id, 中文, English, 日本語, 类型, RA(°), Dec(°), 星等]
+const CAT=[
+['sirius','天狼星','Sirius','シリウス','star',101.287,-16.716,-1.46],
+['arcturus','大角星','Arcturus','アークトゥルス','star',213.915,19.182,-0.05],
+['vega','织女星','Vega','ベガ','star',279.235,38.784,0.03],
+['capella','五车二','Capella','カペラ','star',79.172,45.998,0.08],
+['rigel','参宿七','Rigel','リゲル','star',78.634,-8.202,0.13],
+['procyon','南河三','Procyon','プロキオン','star',114.825,5.225,0.34],
+['betelgeuse','参宿四','Betelgeuse','ベテルギウス','star',88.793,7.407,0.5],
+['altair','牛郎星','Altair','アルタイル','star',297.696,8.868,0.77],
+['aldebaran','毕宿五','Aldebaran','アルデバラン','star',68.98,16.509,0.85],
+['antares','心宿二','Antares','アンタレス','star',247.352,-26.432,1.06],
+['spica','角宿一','Spica','スピカ','star',201.298,-11.161,0.97],
+['pollux','北河三','Pollux','ポルックス','star',116.329,28.026,1.14],
+['fomalhaut','北落师门','Fomalhaut','フォーマルハウト','star',344.413,-29.622,1.16],
+['deneb','天津四','Deneb','デネブ','star',310.358,45.28,1.25],
+['regulus','轩辕十四','Regulus','レグルス','star',152.093,11.967,1.35],
+['polaris','北极星','Polaris','北極星','star',37.955,89.264,2.0],
+['m31','M31 仙女座星系','Andromeda Galaxy','アンドロメダ銀河','galaxy',10.685,41.269,3.4],
+['m33','M33 三角座星系','Triangulum Galaxy','さんかく座銀河','galaxy',23.462,30.66,5.7],
+['m81','M81/M82 星系','Bode Galaxies','M81・M82','galaxy',148.9,69.07,6.9],
+['m51','M51 涡状星系','Whirlpool Galaxy','子持ち銀河','galaxy',202.47,47.2,8.4],
+['m45','M45 昴星团','Pleiades','すばる','cluster',56.75,24.12,1.6],
+['m44','M44 蜂巢星团','Beehive Cluster','プレセペ星団','cluster',130.1,19.67,3.7],
+['hchi','英仙座双重星团','Double Cluster','二重星団','cluster',35.2,57.13,3.7],
+['m35','M35 双子座星团','M35','M35','cluster',92.25,24.33,5.3],
+['m37','M37 御夫座星团','M37','M37','cluster',88.07,32.55,6.2],
+['m41','M41 大犬座星团','M41','M41','cluster',101.5,-20.75,4.5],
+['m34','M34 英仙座星团','M34','M34','cluster',40.5,42.78,5.5],
+['m13','M13 武仙座球状星团','Hercules Cluster','ヘルクレス座球状星団','cluster',250.42,36.46,5.8],
+['m92','M92 武仙座球状星团','M92','M92','cluster',259.28,43.14,6.3],
+['m3','M3 猎犬座球状星团','M3','M3','cluster',205.55,28.38,6.2],
+['m5','M5 巨蛇座球状星团','M5','M5','cluster',229.64,2.08,5.7],
+['m4','M4 天蝎座球状星团','M4','M4','cluster',245.9,-26.53,5.6],
+['m22','M22 人马座球状星团','M22','M22','cluster',279.1,-23.9,5.1],
+['m15','M15 飞马座球状星团','M15','M15','cluster',322.49,12.17,6.2],
+['m11','M11 野鸭星团','Wild Duck Cluster','ワイルドダック星団','cluster',282.77,-6.27,6.3],
+['m42','M42 猎户座大星云','Orion Nebula','オリオン大星雲','nebula',83.82,-5.39,4.0],
+['horsehead','马头星云一带','Horsehead region','馬頭星雲','nebula',85.25,-2.46,7.3],
+['rosette','玫瑰星云','Rosette Nebula','バラ星雲','nebula',98.0,4.95,9.0],
+['m1','M1 蟹状星云','Crab Nebula','かに星雲','nebula',83.63,22.01,8.4],
+['m8','M8 礁湖星云','Lagoon Nebula','干潟星雲','nebula',270.9,-24.38,6.0],
+['m20','M20 三叶星云','Trifid Nebula','三裂星雲','nebula',270.6,-23.03,6.3],
+['m16','M16 鹰状星云','Eagle Nebula','わし星雲','nebula',274.7,-13.8,6.0],
+['m17','M17 天鹅星云','Omega Nebula','オメガ星雲','nebula',275.2,-16.18,6.0],
+['m27','M27 哑铃星云','Dumbbell Nebula','あれい状星雲','nebula',299.9,22.72,7.5],
+['m57','M57 环状星云','Ring Nebula','環状星雲','nebula',283.4,33.03,8.8],
+['ngc7000','NGC7000 北美洲星云','North America Nebula','北アメリカ星雲','nebula',314.7,44.3,4.0]
+];
+const COLOR_OF={star:'#e2e8f0',cluster:'#7dd3fc',nebula:'#f0abfc',galaxy:'#86efac',meteor:'#5eead4',mw:'#c4b5fd',moon:'#fde68a'};
+
+function visIdx(S,alts,thr,minAlt){
+  const segs=[]; let a=null;
+  for(let i=0;i<S.length;i++){
+    const ok=alts[i]>=minAlt&&S[i].sunAlt<thr;
+    if(ok){ if(a==null) a=i; } else if(a!=null){ segs.push([a,i-1]); a=null; }
+  }
+  if(a!=null) segs.push([a,S.length-1]);
+  return segs;
+}
+function mkObj(meta,alts,S,E,thr,minAlt,radec){
+  const segs=visIdx(S,alts,thr,minAlt); let bi=-1,best=-90;
+  segs.forEach(([a,b])=>{ for(let i=a;i<=b;i++) if(alts[i]>best){best=alts[i];bi=i;} });
+  const o=Object.assign({alts,vis:segs.length>0,bestMs:bi>=0?S[bi].ms:null,maxAlt:bi>=0?best:Math.max(...alts),
+    segs:segs.map(([a,b])=>({a:S[a].ms,b:S[b].ms+600000}))},meta);
+  if(bi>=0){
+    const rd=typeof radec==='function'?radec(bi):radec;
+    if(rd){ const m=E.arr[bi].moon; o.moonSep=angSep(rd[0],rd[1],m.ra,m.dec); o.moonUp=S[bi].moonAlt>-0.833; }
+  }
+  return o;
+}
+function buildObjects(A,E,act,site){
+  const S=A.S, out=[], lat=site.lat, lon=site.lon;
+  // 月亮
+  out.push(mkObj({id:'moon',name:'月亮',en:'Moon',jp:'月',type:'moon',mag:-12.5,col:COLOR_OF.moon},S.map(s=>s.moonAlt),S,E,0,5,null));
+  // 行星
+  for(const n in PINFO){
+    const alts=S.map(s=>s['p_'+n]);
+    const o=mkObj({id:'pl_'+n,name:PINFO[n][1],en:PINFO[n][0],jp:PINFO[n][1],type:'planet',col:PCOL[n]},alts,S,E,-6,10,bi=>[E.arr[bi].pl[n].ra,E.arr[bi].pl[n].dec]);
+    const pi=o.bestMs!=null?Math.round((o.bestMs-E.t0)/600000):Math.floor(S.length/2);
+    o.mag=E.arr[pi].pl[n].mag; o.el=E.arr[pi].pl[n].el;
+    out.push(o);
+  }
+  // 银河
+  out.push(mkObj({id:'mw_gc',name:'银河中心（银心）',en:'Galactic Center',jp:'天の川の中心',type:'mw',mag:null,col:COLOR_OF.mw},S.map(s=>s.gc),S,E,-15,8,[GC.ra,GC.dec]));
+  out.push(mkObj({id:'mw_plane',name:'银河带最高点',en:'Milky Way band',jp:'天の川',type:'mw',mag:null,col:'#a78bfa'},S.map(s=>A.planeAlt(s.ms).alt),S,E,-15,25,null));
+  // 流星雨放射点
+  for(const a of act){
+    out.push(mkObj({id:'sh_'+a.sh.id,name:a.sh.cn+'流星雨',en:a.sh.id+' meteors',jp:a.sh.name,type:'meteor',mag:null,col:COLOR_OF.meteor,note:'活跃度'+Math.round(a.fac*100)+'%，ZHR≈'+Math.round(a.sh.zhr*a.fac)},
+      S.map(s=>altOf(a.sh.ra,a.sh.dec,s.jd,lat,lon)),S,E,-15,15,[a.sh.ra,a.sh.dec]));
+  }
+  // 星表
+  for(const c of CAT){
+    const thr=c[4]==='star'?-12:-15;
+    out.push(mkObj({id:c[0],name:c[1],en:c[2],jp:c[3],type:c[4],mag:c[7],col:COLOR_OF[c[4]]},S.map(s=>altOf(c[5],c[6],s.jd,lat,lon)),S,E,thr,c[4]==='star'?12:20,[c[5],c[6]]));
+  }
+  return out;
+}
+//</CATALOG>
+
+</script>
+<script>
+// ===================== 状态与数据获取 =====================
+const FC_BASE=['cloud_cover','cloud_cover_low','cloud_cover_mid','cloud_cover_high','temperature_2m','dew_point_2m','relative_humidity_2m','wind_speed_10m','wind_direction_10m'];
+const UPPER=['wind_speed_250hPa','wind_speed_300hPa'];
+const REFRESH_MS=30*60*1000, CACHE_MS=15*60*1000;
+const REFSPOT={id:-1,name:'长野中部（默认）',lat:36.0,lon:138.0,elev:1000,type:'plateau',bortle:3,sea:null,region:'中部'};
+const st={tab:'tonight',day:0,region:'全部',sort:'score',raw:null,sig:null,ts:0,loading:false,
+  spot:REFSPOT,spotData:null,spotLoading:false,spotErr:null,ctx:null,
+  objType:'全部',q:'',onlyVis:true,objSort:'mag',objLimit:30,pins:[],heat:null,heatLoading:false,longRes:{}};
+try{ st.pins=JSON.parse(localStorage.getItem('hoshi-pins')||'[]'); }catch(e){}
+const $=id=>document.getElementById(id);
+const qs=list=>'latitude='+list.map(x=>x.lat).join(',')+'&longitude='+list.map(x=>x.lon).join(',');
+async function getJSON(url){ const r=await fetch(url,{cache:'no-store'}); if(!r.ok){const e=new Error('HTTP '+r.status); e.status=r.status; throw e;} return r.json(); }
+
+async function loadFor(list,days){
+  const common=`&timezone=Asia%2FTokyo&past_days=1&forecast_days=${days}&wind_speed_unit=ms`;
+  const base=`https://api.open-meteo.com/v1/forecast?${qs(list)}${common}`;
+  const tries=[{m:MODELS,v:FC_BASE.concat(UPPER)},{m:MODELS,v:FC_BASE},{m:[MODELS[0]],v:FC_BASE},{m:[MODELS[1]],v:FC_BASE}];
+  let fc=null,hasJet=false,last=null;
+  for(const t of tries){
+    try{ fc=[].concat(await getJSON(`${base}&hourly=${t.v.join(',')}&models=${t.m.join(',')}`)); fc.forEach(x=>x._models=t.m); hasJet=t.v.includes(UPPER[0]); break; }
+    catch(e){ last=e; if(e.status===429) throw e; }
+  }
+  if(!fc) throw last||new Error('fetch failed');
+  if(!hasJet){ try{ const j=[].concat(await getJSON(`${base}&hourly=${UPPER.join(',')}`)); fc.forEach((x,i)=>x._jet=j[i]); }catch(e){} }
+  let aq=null;
+  try{ aq=[].concat(await getJSON(`https://air-quality-api.open-meteo.com/v1/air-quality?${qs(list)}&hourly=aerosol_optical_depth,dust,pm2_5&timezone=Asia%2FTokyo&past_days=1&forecast_days=${Math.min(7,days)}`)); }catch(e){}
+  return {fc,aq,hasJet};
+}
+function sigOf(raw){ let s=''; for(let i=0;i<Math.min(8,raw.fc.length);i++){ const h=raw.fc[i].hourly||{}; for(const k in h){ if(k.startsWith('cloud_cover_low')||k.startsWith('temperature_2m')) s+=(h[k]||[]).join(','); } } let x=5381; for(let i=0;i<s.length;i++) x=((x<<5)+x+s.charCodeAt(i))|0; return x; }
+function setStatus(msg,cls){ const e=$('status'); e.textContent=msg; e.className=cls||''; }
+
+async function refresh(force){
+  if(st.loading) return; st.loading=true; $('refresh').textContent='… 刷新中';
+  try{
+    let raw=null;
+    if(!force){ try{ const c=JSON.parse(localStorage.getItem('hoshi-cache')||'null'); if(c&&Date.now()-c.ts<CACHE_MS){ raw=c.raw; st.ts=c.ts; } }catch(e){} }
+    if(!raw){ raw=await loadFor(SITES,3); st.ts=Date.now(); try{ localStorage.setItem('hoshi-cache',JSON.stringify({ts:st.ts,raw})); }catch(e){} }
+    const sig=sigOf(raw); const changed=st.sig!==null&&st.sig!==sig;
+    st.raw=raw; st.sig=sig;
+    if(force&&st.spotData){ st.spotData=null; ensureSpot(); }
+    renderTab();
+    const t=new Date(st.ts).toLocaleTimeString('ja-JP',{timeZone:'Asia/Tokyo',hour:'2-digit',minute:'2-digit'});
+    const notes=[]; if(!raw.hasJet) notes.push('高空风用默认模型补充'); if(!raw.aq) notes.push('气溶胶数据暂缺，透明度按湿度估算'); if(raw.fc[0]._models.length<2) notes.push('仅单模型');
+    setStatus((changed?'🆕 模型有新数据！ ':'✅ ')+'已同步 '+t+'（JST）· 每30分钟自动检查'+(notes.length?' · '+notes.join('；'):''),changed?'new':'');
+  }catch(e){
+    setStatus(e.status===429?'⚠️ 今天的免费请求额度用完了，晚点再来（页面会继续显示上一次数据）':'⚠️ 连不上数据源（'+(e.message||e)+'）。检查网络后点“刷新”。','err');
+    if(st.raw) renderTab();
+  }finally{ st.loading=false; $('refresh').textContent='↻ 刷新'; }
+}
+
+// ===================== 通用渲染 =====================
+const REGIONS=['全部','北海道','東北','関東','中部','近畿','中国','四国','九州','離島'];
+const TYPE_JP2=TYPE_JP;
+function scoreColor(v){ return v>=70?'#5eead4':v>=50?'#a3e635':v>=30?'#fbbf24':'#fb7185'; }
+function cellColor(P){ const a=[70,80,110], b=[94,234,212]; const k=clamp(P); return `rgb(${a.map((x,i)=>Math.round(x+(b[i]-x)*k)).join(',')})`; }
+function verdict(s){ return s>=70?'超适合，直接冲':s>=50?'可以去':s>=30?'看运气':'别去，睡觉'; }
+function moonEmoji(age){ return ['🌑','🌒','🌓','🌔','🌕','🌖','🌗','🌘'][Math.round(age/29.530588*8)%8]; }
+const WK=['日','一','二','三','四','五','六'];
+function curWin(off){ const now=jstNow(); const win=nightWindow(off,now); return {now,win,nowIso:now.date+'T'+pad(now.hour)+':00'}; }
+
+function card(r){
+  const s=r.site, n=r.rows.length, col=scoreColor(r.score);
+  const cols=`grid-template-columns:repeat(${n},1fr)`;
+  const cells=r.rows.map(x=>`<div class="cell${x.glow>0.25?' moon':''}${x.df<0.5?' twi':''}" style="background:${cellColor(x.P)}" title="${pad(x.hour)}时 晴率${Math.round(x.P*100)}%"><i style="height:${Math.round(x.risk*0.9)}%"></i></div>`).join('');
+  const axis=r.rows.map((x,i)=>`<div>${(i%2===0)?pad(x.hour):''}</div>`).join('');
+  let line;
+  if(r.state==='stable') line='🌟 全程基本晴，放心冲';
+  else if(r.state==='cloudy') line='☁️ 云太多，整晚都不理想';
+  else if(r.state==='worse') line='📉 前半夜还行，后半夜变差';
+  else line='🌤 先糊后清'+(r.clearAt!=null?`，预计 ${pad(r.clearAt)} 点前后转晴`:'');
+  let warn=''; if(r.maxRisk>=45){ warn=`<div class="note warn">⚠️ 地形云风险 ${r.maxRisk}%（${pad(r.peakHour)}点最高）${r.surge?'——云图现在看着晴，夜里可能突然起云':''}${r.whyTop.length?'：'+r.whyTop.join('；'):''}</div>`; }
+  const A=r.ast, tm=x=>x?hmOf(x):'—';
+  const freeTxt=A.free?`${tm(A.free.a)}–${tm(A.free.b)}（${A.free.hours.toFixed(1)}小时）`:'今晚没有无月暗夜';
+  let gcTxt;
+  if(A.gcFree) gcTxt=`🌌 银心可拍：${tm(A.gcFree.a)}–${tm(A.gcFree.b)}，最高${Math.round(A.gcBest.alt)}°`;
+  else if(A.gcBest&&A.gcBest.alt>=8) gcTxt=`🌌 银心最高${Math.round(A.gcBest.alt)}°（${tm(A.gcBest.ms)}），但有月光/天未黑透`;
+  else { const bx=r.rows.reduce((b,x)=>x.plane>b.plane?x:b,r.rows[0]); gcTxt=`🌌 银心不在夜空；银河带最高在${mwName(bx.planeL)}（${Math.round(bx.plane)}°）`; }
+  const astroHtml=`<div class="note">🌑 无月暗夜 ${freeTxt} · 月亮${Math.round(A.ill*100)}%${A.t.moonrise?' · 月出'+tm(A.t.moonrise):''}${A.t.moonset?' · 月落'+tm(A.t.moonset):''}</div><div class="note">${gcTxt}</div>`+
+    (r.metBest?`<div class="note">☄️ ${r.metBest.jp}：${pad(r.metBest.hour)}点最佳，理想天空约${r.metBest.rate}个/时，按预报云量约${r.metBest.rateW}个/时（放射点${r.metBest.alt}°）${r.metBest.note?'<br><small style="color:var(--mu)">'+r.metBest.note+'</small>':''}</div>`:'');
+  const dis = r.dis>0.25 ? '<div class="tg">⚖️ JMA 和 ECMWF 分歧较大，这里的预测不太稳</div>' : '';
+  const rowsT=r.rows.map(x=>`<tr><td>${pad(x.hour)}</td><td>${Math.round(x.L)}</td><td>${Math.round(x.M)}</td><td>${Math.round(x.H)}</td><td style="color:${x.risk>=45?'var(--risk)':'inherit'}">${x.risk}</td><td>${Math.round(x.P*100)}%</td><td>${x.ws.toFixed(1)}</td><td>${x.jet==null?'–':Math.round(x.jet)}</td><td>${x.tra}</td><td>${x.see}</td></tr>`).join('');
+  return `<div class="card" data-i="${s.id}">
+  <div class="hd"><div class="nm"><b>${s.name}</b><div>${s.region} · ${TYPE_JP[s.type]} · ${s.elev}m · ${s.bortleUnknown?'Bortle 未知':'Bortle≈'+s.bortle}</div></div>
+  <div class="sc" style="color:${col}">${r.score}<small>${verdict(r.score)}</small></div></div>
+  <div class="strip" style="${cols}">${cells}</div><div class="axis" style="${cols}">${axis}</div>
+  <div class="legend">色块=晴朗概率（越亮越晴）· 橙柱=地形云风险 · 黄边=月亮在天上 · 淡色=天还没黑透</div>
+  <div class="note">${line}</div>${warn}${astroHtml}${dis}
+  <div class="m"><span>晴率 <b>${r.pclear}%</b></span><span>散去 <b>${r.clearing}</b></span><span>深空 <b>${r.deep}</b></span><span>银河 <b>${r.mwIdx}</b></span><span>云 低<b>${r.L}</b>/中<b>${r.M}</b>/高<b>${r.H}</b>%</span><span>风 <b>${r.ws.toFixed(1)}</b>m/s（最大${r.wsMax.toFixed(0)}）</span><span>透明度 <b>${label(r.tra,70,50,30)}</b></span><span>视宁度 <b>${label(r.see,75,55,35)}</b>${r.jet!=null?'（急流'+Math.round(r.jet)+'m/s）':''}</span></div>
+  <div class="more"><table><tr><th>时</th><th>低云</th><th>中云</th><th>高云</th><th>地形云</th><th>晴率</th><th>风m/s</th><th>高空风</th><th>透明</th><th>视宁</th></tr>${rowsT}</table>
+  <a class="lk" target="_blank" rel="noopener" href="https://www.lightpollutionmap.info/#zoom=11&lat=${s.lat}&lon=${s.lon}">光污染地图 ↗</a>
+  <a class="lk" target="_blank" rel="noopener" href="https://www.google.com/maps?q=${s.lat},${s.lon}">谷歌地图 ↗</a></div>
+  <div class="tg">点卡片展开逐小时数据</div></div>`;
+}
+
+// ===================== 榜单 =====================
+function results(){
+  const {now,win,nowIso}=curWin(st.day);
+  const out=[]; SITES.forEach((s,i)=>{ const r=computeSite(s,st.raw.fc[i],st.raw.aq&&st.raw.aq[i],win,nowIso); if(r) out.push(r); });
+  const eph=ephemFor(win.base), act=activeShowers(win.base);
+  out.forEach(r=>decorate(r,eph,act));
+  return {out,win,now,eph,act};
+}
+function renderTonight(){
+  if(!st.raw) return;
+  const {out,win,eph}=results();
+  const ill=Math.round(eph.ill*100);
+  $('moon').textContent=`${win.base.slice(5).replace('-','/')} 夜 · 窗口 ${pad(win.start)}:00–${pad(win.end%24)}:00 · ${moonEmoji(eph.moonAge)} 月亮≈${ill}%`+(ill>=60?'（月光偏强，银河会被压）':ill<=15?'（几乎无月，银河友好）':'');
+  const key={score:r=>-r.score,clear:r=>-r.pclear,deep:r=>-r.deep,mw:r=>-r.mwIdx,clearing:r=>-r.clearing,risk:r=>r.maxRisk}[st.sort];
+  const pool=out.filter(r=>st.region==='全部'||r.site.region===st.region).sort((a,b)=>key(a)-key(b));
+  const top=[...out].sort((a,b)=>b.score-a.score).slice(0,3);
+  $('top3').innerHTML=top.map(r=>`<div class="t3" data-site="${r.site.id}"><span>${r.site.region}</span><b>${r.site.name}</b><em style="color:${scoreColor(r.score)}">${r.score}</em></div>`).join('');
+  $('list').innerHTML=pool.length?pool.map(card).join(''):'<div class="card">这个区域暂时没有可用数据。</div>';
+  window._lastOut=out;
+  if(window._map) updateMarkers(out);
+}
+function renderChips(){
+  const html=REGIONS.map(r=>`<button class="chip${r===st.region?' on':''}" data-r="${r}">${r}</button>`).join('');
+  $('regions').innerHTML=html; $('regions2').innerHTML=html;
+}
+
+// ===================== 观测点 =====================
+const guessType=el=>el>=500?'mountain':el<=40?'coast':'basin';
+function spotBar(){
+  const s=st.spot;
+  return `<div class="spotbar">📍 观测点：<b>${s.name}</b><span style="color:var(--mu)">${s.bortleUnknown?'Bortle 未知':'Bortle≈'+s.bortle}${s.elev!=null?' · '+s.elev+'m':''}${st.spotLoading?' · 加载中…':''}</span><button class="btn sm" data-go="map">换地点</button></div>`;
+}
+async function ensureSpot(){
+  if(st.spotData||st.spotLoading) return;
+  const sp=st.spot; st.spotLoading=true; st.spotErr=null; renderTab();
+  try{
+    const d=await loadFor([sp],15);
+    if(st.spot===sp){
+      st.spotData=d;
+      const el=d.fc[0].elevation;
+      if(sp.custom&&el!=null){ sp.elev=Math.round(el); sp.type=guessType(el); sp.sea=sp.type==='coast'?ALL:null; }
+    }
+  }catch(e){ st.spotErr=e; }
+  st.spotLoading=false; st.ctx=null; renderTab();
+}
+function setSpot(sp){ st.spot=sp; st.spotData=null; st.spotErr=null; st.ctx=null; st.longRes={}; ensureSpot(); renderTab(); }
+function spotRes(off){
+  const d=st.spotData; if(!d) return null;
+  const {win,nowIso}=curWin(off);
+  const r=computeSite(st.spot,d.fc[0],d.aq&&d.aq[0],win,nowIso); if(!r) return null;
+  decorate(r,ephemFor(win.base),activeShowers(win.base)); r.win=win; return r;
+}
+const hav=(a,b,c,d)=>{ const R=6371,p=Math.PI/180,x=Math.sin((c-a)*p/2)**2+Math.cos(a*p)*Math.cos(c*p)*Math.sin((d-b)*p/2)**2; return 2*R*Math.asin(Math.sqrt(x)); };
+
+// ===================== 地图 =====================
+function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script'); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+function loadCss(href){ const l=document.createElement('link'); l.rel='stylesheet'; l.href=href; document.head.appendChild(l); }
+let pin=null;
+async function initMap(){
+  if(!window.L){ loadCss('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css'); try{ await loadScript('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js'); }catch(e){ $('satinfo').textContent='地图库加载失败，检查网络'; return; } }
+  if(!window._map){
+    const m=L.map('map').setView([37.5,138.5],5); window._map=m;
+    L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png',{attribution:'国土地理院',maxZoom:14}).addTo(m);
+    window._mk=L.layerGroup().addTo(m);
+    m.on('click',e=>pickPoint(e.latlng.lat,e.latlng.lng,'自选点'));
+    try{
+      const tt=await getJSON('https://www.jma.go.jp/bosai/himawari/data/satimg/targetTimes_jp.json');
+      const t=tt[tt.length-1];
+      L.tileLayer(`https://www.jma.go.jp/bosai/himawari/data/satimg/${t.basetime}/jp/${t.validtime}/B13/TBB/{z}/{x}/{y}.jpg`,{opacity:.55,minNativeZoom:4,maxNativeZoom:6,attribution:'気象庁ひまわり'}).addTo(m);
+      const v=t.validtime; $('satinfo').textContent=`红外云图：${v.slice(4,6)}/${v.slice(6,8)} ${v.slice(8,10)}:${v.slice(10,12)} UTC（看不出很低的雾/层云，靠“地形云风险”补）`;
+    }catch(e){ $('satinfo').innerHTML='卫星云图加载失败（可能被浏览器跨域拦截）。<a style="color:var(--ok)" target="_blank" rel="noopener" href="https://www.jma.go.jp/bosai/map.html#contents=himawari">直接打开气象庁云图 ↗</a>'; }
+    if(window._lastOut) updateMarkers(window._lastOut);
+    if(st.spot.custom) placePin(st.spot.lat,st.spot.lon);
+  }
+  setTimeout(()=>window._map.invalidateSize(),60);
+}
+function placePin(lat,lon){ if(!window._map) return; if(pin) pin.setLatLng([lat,lon]); else pin=L.marker([lat,lon]).addTo(window._map); }
+function updateMarkers(out){
+  if(!window._mk) return; window._mk.clearLayers();
+  out.forEach(r=>{ const s=r.site;
+    L.circleMarker([s.lat,s.lon],{radius:9,color:'#0b1020',weight:1.5,fillColor:scoreColor(r.score),fillOpacity:.95,bubblingMouseEvents:false})
+      .on('click',()=>{ placePin(s.lat,s.lon); setSpot(s); }).bindTooltip(`${s.name} ${r.score}`).addTo(window._mk); });
+}
+function pickPoint(lat,lon,name){
+  placePin(lat,lon);
+  setSpot({id:-1,name:`${name} ${lat.toFixed(3)}, ${lon.toFixed(3)}`,lat,lon,elev:null,type:'basin',bortle:4,bortleUnknown:true,region:'自选',sea:null,custom:true});
+}
+function locate(){
+  if(!navigator.geolocation){ setStatus('⚠️ 这个浏览器不支持定位','err'); return; }
+  setStatus('正在获取定位…（Safari 会问你要不要允许）');
+  navigator.geolocation.getCurrentPosition(p=>{
+    const {latitude:la,longitude:lo}=p.coords; setStatus('✅ 已定位');
+    if(window._map) window._map.setView([la,lo],9);
+    pickPoint(la,lo,'我的位置');
+  },err=>setStatus('⚠️ 定位失败：'+(err.code===1?'没有授权（设置→Safari→位置 里允许）':'拿不到位置'),'err'),{enableHighAccuracy:false,timeout:12000,maximumAge:300000});
+}
+function renderMapTab(){
+  const box=$('spotCard');
+  if(!st.spot.custom&&st.spot.id<0){ box.innerHTML='<div class="spotbar">👆 点地图任意位置，或点圆点，或“用我的位置”。</div>'; return; }
+  let html=spotBar();
+  if(st.spotErr) html+='<div class="card">天气数据没取到，点右上“刷新”再试。</div>';
+  else if(!st.spotData) html+='<div class="card">正在取这个点的天气…</div>';
+  else{
+    const r=spotRes(st.day);
+    if(r){
+      html+=card(r).replace('class="card"','class="card open"');
+      const near=SITES.map(s=>({s,d:hav(st.spot.lat,st.spot.lon,s.lat,s.lon)})).sort((a,b)=>a.d-b.d).slice(0,3);
+      const sc=id=>{ const o=(window._lastOut||[]).find(x=>x.site.id===id); return o?o.score:'–'; };
+      html+=`<div class="card"><b>离这里最近的暗空点</b>${near.map(n=>`<div class="note" data-site="${n.s.id}" style="cursor:pointer">${n.s.name}（Bortle≈${n.s.bortle}）· ${Math.round(n.d)} km · 今晚 ${sc(n.s.id)} 分</div>`).join('')}<div class="tg">点一个就切过去看</div></div>`;
+      html+=`<div class="bar"><button class="btn" data-go="sky">🔭 看这里的星体时间线</button><button class="btn" data-go="long">📅 看14天</button></div>`;
+    } else html+='<div class="card">这个点暂时算不出结果。</div>';
+  }
+  box.innerHTML=html;
+}
+
+// ===================== 星体时间线 =====================
+function skyCtx(){
+  const {win}=curWin(st.day);
+  const key=st.spot.lat+','+st.spot.lon+'|'+win.base;
+  if(!st.ctx||st.ctx.key!==key){
+    const E=ephemFor(win.base), act=activeShowers(win.base), A=siteAstro(st.spot,E), objs=buildObjects(A,E,act,st.spot);
+    st.ctx={key,win,E,act,A,objs};
+  }
+  return st.ctx;
+}
+const tmOf=x=>x?hmOf(x):'—';
+function segText(o){ return o.segs.slice(0,2).map(s=>tmOf(s.a)+'–'+tmOf(s.b)).join('、'); }
+function objInfo(o,ctx){
+  let s;
+  if(o.id==='moon'){ const A=ctx.A; s=`月亮亮度 ${Math.round(A.ill*100)}%（月龄${A.age.toFixed(1)}）${A.t.moonrise?' · 月出 '+tmOf(A.t.moonrise):''}${A.t.moonset?' · 月落 '+tmOf(A.t.moonset):''}`; return s; }
+  s=o.vis?`${o.name}：${segText(o)} 可观测，${tmOf(o.bestMs)} 最高 ${Math.round(o.maxAlt)}°`:`${o.name}：今晚没有合适的观测窗口（最高${Math.round(o.maxAlt)}°）`;
+  if(o.mag!=null&&o.type!=='moon') s+=` · ${o.mag.toFixed(1)}等`;
+  if(o.note) s+=' · '+o.note;
+  if(o.moonSep!=null&&o.moonUp&&o.moonSep<45) s+=` · ⚠️ 离月亮仅 ${Math.round(o.moonSep)}°，会被月光冲淡`;
+  return s;
+}
+function chartHTML(ctx,res){
+  const {A,E,objs,act}=ctx, S=A.S;
+  const t0=Math.max(E.t0,(A.t.sunset||E.t0)-3600000), t1=Math.min(S[S.length-1].ms,(A.t.sunrise||S[S.length-1].ms)+3600000);
+  const W=360,LW=70,CW=W-LW-6,X=ms=>LW+(ms-t0)/(t1-t0)*CW,RH=20,GAP=5,TOP=16;
+  const rows=[];
+  rows.push({label:'🌙 月亮',alts:S.map(s=>s.moonAlt),color:'#fde68a',o:objs.find(o=>o.id==='moon')});
+  const gc=objs.find(o=>o.id==='mw_gc'), pl=objs.find(o=>o.id==='mw_plane');
+  rows.push({label:'🌌 银心',alts:gc.alts,color:'#c4b5fd',o:gc});
+  rows.push({label:'银河带',alts:pl.alts,color:'#a78bfa',o:pl});
+  objs.filter(o=>o.type==='planet'&&o.vis).sort((a,b)=>a.mag-b.mag).forEach(o=>rows.push({label:o.name+' '+o.mag.toFixed(1),alts:o.alts,color:o.col,o}));
+  objs.filter(o=>['cluster','nebula','galaxy'].includes(o.type)&&o.vis&&o.mag<=7.5).sort((a,b)=>b.maxAlt-a.maxAlt).slice(0,4).forEach(o=>rows.push({label:o.name.split(' ')[0]+(o.name.includes(' ')?' '+o.name.split(' ')[1].slice(0,4):''),alts:o.alts,color:o.col,o}));
+  act.filter(a=>a.fac>=0.3).forEach(a=>{ const o=objs.find(x=>x.id==='sh_'+a.sh.id); if(o) rows.push({label:'☄️ '+a.sh.cn,alts:o.alts,color:o.col,o}); });
+  st.pins.forEach(id=>{ const o=objs.find(x=>x.id===id); if(o&&!rows.some(r=>r.o===o)) rows.push({label:'📌 '+o.name.split(' ')[0].slice(0,7),alts:o.alts,color:o.col,o}); });
+  const hasW=!!res, nR=rows.length+(hasW?1:0), H=TOP+nR*(RH+GAP)+4;
+  let g='';
+  // 天色背景
+  const fill=a=>a<-18?'#080c1f':a<-12?'#0f1736':a<-6?'#1a2552':a<0?'#2a3868':'#3b4d86';
+  for(let i=0;i<S.length;i++){ const a=Math.max(t0,S[i].ms), b=Math.min(t1,S[i].ms+600000); if(b<=a) continue; g+=`<rect x="${X(a).toFixed(1)}" y="${TOP-2}" width="${(X(b)-X(a)+0.6).toFixed(1)}" height="${H-TOP}" fill="${fill(S[i].sunAlt)}"/>`; }
+  // 时间轴
+  for(let ms=Math.ceil(t0/3600000)*3600000; ms<=t1; ms+=3600000){ const h=+hmOf(ms).slice(0,2); if(h%2===0) g+=`<text x="${X(ms).toFixed(1)}" y="10" text-anchor="middle">${pad(h)}</text><line x1="${X(ms).toFixed(1)}" x2="${X(ms).toFixed(1)}" y1="${TOP-2}" y2="${H}" stroke="rgba(255,255,255,.07)"/>`; }
+  let ri=0; const golden=[];
+  const rowY=i=>TOP+i*(RH+GAP);
+  if(hasW){
+    const y=rowY(ri);
+    g+=`<text x="2" y="${y+14}">☁️ 晴率</text>`;
+    let seg=null;
+    res.rows.forEach(x=>{ const ms=msOfJst(x.t.slice(0,10),+x.t.slice(11,13)); g+=`<rect x="${X(ms).toFixed(1)}" y="${y}" width="${(X(ms+3600000)-X(ms)-0.6).toFixed(1)}" height="${RH}" rx="3" fill="${cellColor(x.P)}" opacity="${x.df<0.5?0.45:0.95}"/>`;
+      const good=x.df>=0.9&&x.glow<0.25&&x.P>=0.5; if(good){ if(!seg) seg={a:ms,b:ms+3600000}; else seg.b=ms+3600000; } else if(seg){ golden.push(seg); seg=null; } });
+    if(seg) golden.push(seg);
+    golden.forEach(s=>{ g+=`<rect x="${X(s.a).toFixed(1)}" y="${TOP-2}" width="${(X(s.b)-X(s.a)).toFixed(1)}" height="${H-TOP}" fill="#5eead4" opacity=".10" stroke="#5eead4" stroke-opacity=".6" stroke-dasharray="3 2"/>`; });
+    g+=`<g data-r="w"><rect x="0" y="${y}" width="${W}" height="${RH}" fill="transparent"/></g>`;
+    ri++;
+  }
+  const base=ri;
+  rows.forEach((r,k)=>{
+    const y=rowY(base+k);
+    g+=`<rect x="${LW}" y="${y}" width="${CW}" height="${RH}" fill="rgba(255,255,255,.035)" rx="3"/><text x="2" y="${y+14}">${r.label}</text>`;
+    for(let i=0;i<S.length;i++){
+      const a=r.alts[i]; if(a<=0) continue;
+      const ms=S[i].ms; if(ms+600000<t0||ms>t1) continue;
+      const h=Math.max(1.5,Math.min(1,a/70)*RH), op=(a<12?0.3:0.95)*(S[i].sunAlt>-6?0.6:1);
+      g+=`<rect x="${X(Math.max(ms,t0)).toFixed(1)}" y="${(y+RH-h).toFixed(1)}" width="${(X(Math.min(ms+600000,t1))-X(Math.max(ms,t0))+0.6).toFixed(1)}" height="${h.toFixed(1)}" fill="${r.color}" opacity="${op}"/>`;
+    }
+    g+=`<g data-r="${k}"><rect x="0" y="${y}" width="${W}" height="${RH}" fill="transparent"/></g>`;
+  });
+  const now=jstNow(), nowMs=msOfJst(now.date,now.hour,now.min);
+  if(st.day===0&&nowMs>=t0&&nowMs<=t1) g+=`<line x1="${X(nowMs).toFixed(1)}" x2="${X(nowMs).toFixed(1)}" y1="${TOP-4}" y2="${H}" stroke="#fb7185" stroke-width="1.5" stroke-dasharray="4 3"/><text x="${X(nowMs).toFixed(1)}" y="${H+8}" text-anchor="middle" style="fill:#fb7185">现在</text>`;
+  st.chartRows={rows,res,ctx};
+  const svg=`<svg viewBox="0 0 ${W} ${H+12}" xmlns="http://www.w3.org/2000/svg">${g}</svg>`;
+  const gtxt=golden.length?`🌟 黄金观测时段：${golden.map(s=>tmOf(s.a)+'–'+tmOf(s.b)).join('、')}（天全黑 + 月亮不碍事 + 晴率≥50%）`:(res?'🌟 今晚没有同时满足“全黑 + 无月光 + 晴”的时段':'');
+  return {svg,gtxt};
+}
+function objectItems(ctx){
+  const {A,E}=ctx; const S=A.S;
+  const t0=Math.max(E.t0,(A.t.sunset||E.t0)-3600000), t1=Math.min(S[S.length-1].ms,(A.t.sunrise||S[S.length-1].ms)+3600000);
+  let list=ctx.objs.filter(o=>{
+    if(st.objType!=='全部'&&TYPE_CN[o.type]!==st.objType) return false;
+    if(st.onlyVis&&!o.vis) return false;
+    if(st.q){ const q=st.q.toLowerCase(); if(!(o.name+' '+o.en+' '+o.jp).toLowerCase().includes(q)) return false; }
+    return true;
+  });
+  const key={mag:o=>o.mag==null?99:o.mag,alt:o=>-o.maxAlt,time:o=>o.bestMs||9e15}[st.objSort];
+  list.sort((a,b)=>key(a)-key(b));
+  const total=list.length; list=list.slice(0,st.objLimit);
+  const sp=o=>{
+    const w=120,h=22; let d='';
+    const pts=[]; for(let i=0;i<S.length;i++){ if(S[i].ms<t0||S[i].ms>t1) continue; pts.push([(S[i].ms-t0)/(t1-t0)*w,h-Math.max(0,Math.min(1,o.alts[i]/80))*h]); }
+    d='M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L')+`L${w},${h}L0,${h}Z`;
+    const dark=pts.length?'':'';
+    return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><path d="${d}" fill="${o.col}" fill-opacity="${o.vis?0.45:0.15}" stroke="${o.col}" stroke-width="1" stroke-opacity="${o.vis?0.9:0.35}"/></svg>`;
+  };
+  const html=list.map(o=>`<div class="obj"><div class="oh"><div><b>${o.name}</b><span class="ty">${TYPE_CN[o.type]}${o.mag!=null&&o.type!=='moon'?' · '+o.mag.toFixed(1)+'等':''}</span></div><button class="pin${st.pins.includes(o.id)?' on':''}" data-pin="${o.id}">📌</button></div>${sp(o)}<div class="ot">${o.id==='moon'?objInfo(o,ctx):(o.vis?`可见 ${segText(o)} · 最佳 ${tmOf(o.bestMs)} 高${Math.round(o.maxAlt)}°`:'今晚没有合适的观测窗口')}${o.moonSep!=null&&o.moonUp&&o.moonSep<45?` · ⚠️离月亮${Math.round(o.moonSep)}°`:''}${o.note?'<br>'+o.note:''}<br><span style="opacity:.7">${o.en} · ${o.jp}</span></div></div>`).join('');
+  return html+(total>list.length?`<div class="bar"><button class="btn" id="moreObj">再显示 ${Math.min(30,total-list.length)} 个（共${total}）</button></div>`:'')+(total===0?'<div class="card">没有符合的星体。试试关掉“只看今晚能看到的”。</div>':'');
+}
+const OBJ_TYPES=['全部','行星','月亮','亮星','星团','星云','星系','银河','流星雨'];
+function renderSkyTab(){
+  $('skyBar').innerHTML=spotBar();
+  const ctx=skyCtx(), A=ctx.A, act=ctx.act;
+  const kv=(k,v)=>`<b>${k}</b><span>${v}</span>`, rows=[];
+  rows.push(kv('🌅 太阳',`日落 ${tmOf(A.t.sunset)} · 全黑 ${tmOf(A.t.astroEnd)} · 天文黎明 ${tmOf(A.t.astroStart)} · 日出 ${tmOf(A.t.sunrise)}`));
+  rows.push(kv('🌙 月亮',`${moonEmoji(A.age)} ${Math.round(A.ill*100)}%${A.t.moonrise?' · 月出 '+tmOf(A.t.moonrise):''}${A.t.moonset?' · 月落 '+tmOf(A.t.moonset):''}${(!A.t.moonrise&&!A.t.moonset)?(A.moonUpAtSunset?' · 整晚在天上':' · 整晚不在'):''}`));
+  rows.push(kv('🌑 无月暗夜',A.free?`${tmOf(A.free.a)}–${tmOf(A.free.b)}（${A.free.hours.toFixed(1)}小时）`:'今晚没有'));
+  rows.push(kv('🌌 银河',A.gcFree?`银心 ${tmOf(A.gcFree.a)}–${tmOf(A.gcFree.b)}，最高 ${Math.round(A.gcBest.alt)}°`:(A.gcBest&&A.gcBest.alt>=8?`银心最高 ${Math.round(A.gcBest.alt)}°，但有月光`:'银心整晚不在夜空（日本约 3–10 月）；可拍冬季银河')));
+  if(act.length) rows.push(kv('☄️ 流星雨',act.map(a=>`${a.sh.name} 活跃度${Math.round(a.fac*100)}%`).join('、')));
+  $('skyKV').innerHTML=`<div class="kv">${rows.join('')}</div>`;
+  let res=null; if(st.spotData) res=spotRes(st.day);
+  const {svg,gtxt}=chartHTML(ctx,res);
+  $('chart').innerHTML=svg; $('golden').textContent=(st.spotLoading&&!res?'天气加载中…（天文部分已经是准的）':gtxt);
+  $('objChips').innerHTML=OBJ_TYPES.map(t=>`<button class="chip${t===st.objType?' on':''}" data-ot="${t}">${t}</button>`).join('');
+  $('objList').innerHTML=objectItems(ctx);
+  $('evs').ontoggle=()=>{ if($('evs').open) renderEvents(); };
+  if($('evs').open) renderEvents();
+}
+let evCache=null;
+function renderEvents(){
+  const now=jstNow(), nowMs=msOfJst(now.date,now.hour,now.min);
+  if(!evCache||evCache.k!==now.date) evCache={k:now.date,list:upcomingEvents(nowMs,st.spot,120).slice(0,16)};
+  $('evBody').innerHTML=evCache.list.map(e=>`<div>${e.icon} <b>${mdOf(e.ms)} ${hmOf(e.ms)}</b> ${e.title}<small>${e.note}</small></div>`).join('')+'<div class="tg">月相/行星为本地计算（月相与国立天文台公布值相差约20分钟内）；流星雨极大日为常年值，ふたご座・しぶんぎ座按国立天文台预报。日食月食、彗星、ISS未包含。</div>';
+}
+
+// ===================== 14 天 =====================
+function renderLongTab(){
+  $('longBar').innerHTML=spotBar();
+  if(st.spotErr){ $('longList').innerHTML='<div class="card">14 天预报没取到，点上面“↻ 刷新”再试。</div>'; return; }
+  if(!st.spotData){ $('longList').innerHTML='<div class="card">正在取 14 天预报…</div>'; $('longSum').innerHTML=''; ensureSpot(); return; }
+  const now=jstNow(), nowMs=msOfJst(now.date,now.hour,now.min);
+  const ev=upcomingEvents(nowMs,st.spot,16);
+  let html='', best=[]; st.longRes={};
+  for(let off=0;off<14;off++){
+    const r=spotRes(off); const {win}=curWin(off);
+    const E=ephemFor(win.base), d=new Date(win.base+'T00:00:00Z'), md=win.base.slice(5).replace('-','/');
+    if(!r){ html+=`<div class="lr" style="opacity:.4"><div><b>${md}</b><small>周${WK[d.getUTCDay()]}</small></div><div class="mo">${moonEmoji(E.moonAge)}</div><div><small>预报还没覆盖</small></div><div></div></div>`; continue; }
+    st.longRes[off]=r; best.push({off,md,r});
+    const mid=nightMidMs(win.base), tags=ev.filter(e=>Math.abs(e.ms-mid)<=14*3600000&&e.icon!=='🌕'&&e.icon!=='🌑').map(e=>e.icon+' '+e.title.replace(/（.*?）/,'')).slice(0,2);
+    if(E.ill<0.04) tags.unshift('🌑 新月夜'); if(E.ill>0.97) tags.unshift('🌕 满月夜');
+    const conf=off<=3?'可信':off<=7?'参考':'趋势';
+    const free=r.ast.free?r.ast.free.hours:0;
+    html+=`<div class="lr" data-o="${off}" style="opacity:${off>=8?0.65:1};cursor:pointer"><div><b>${md}</b><small>周${WK[d.getUTCDay()]} · ${conf}</small></div><div class="mo">${moonEmoji(E.moonAge)}<small>${Math.round(E.ill*100)}%</small></div>
+      <div><div class="bar2"><i style="width:${r.score}%;background:${scoreColor(r.score)}"></i></div><small>天气 ${r.score} · 晴率 ${r.pclear}%</small></div>
+      <div><div class="bar2"><i style="width:${r.deep}%;background:${scoreColor(r.deep)}"></i></div><small>深空 ${r.deep} · 银河 ${r.mwIdx} · 暗夜${free.toFixed(1)}h</small></div></div>
+      <div class="ltag">${tags.join('　')}</div><div id="lx${off}"></div>`;
+  }
+  const top=[...best].filter(b=>b.off<=7).sort((a,b)=>b.r.deep-a.r.deep).slice(0,3);
+  $('longSum').innerHTML=top.length?`<div class="kv"><b>🏆 未来一周最佳</b><span>${top.map(b=>`${b.md} 深空${b.r.deep}（天气${b.r.score}，月${Math.round(ephemFor(curWin(b.off).win.base).ill*100)}%）`).join('<br>')}</span></div>`:'';
+  $('longList').innerHTML=html+'<div class="tg" style="margin:4px 14px">点某一天展开当晚逐小时。云量预报越往后越不准，淡色的只能当趋势。</div>';
+}
+function heatColor(v){ return `hsl(${Math.round(Math.max(0,Math.min(100,v))*1.4)},55%,${22+Math.min(100,v)*0.22}%)`; }
+async function loadHeat(){
+  if(st.heatLoading) return; st.heatLoading=true; $('heatBtn').textContent='加载中…（要几秒）';
+  try{
+    const d=await loadFor(SITES,15); const now=jstNow(), nowIso=now.date+'T'+pad(now.hour)+':00';
+    const wins=[...Array(14)].map((_,o)=>nightWindow(o,now));
+    const M=SITES.map((s,i)=>wins.map(w=>{ const r=computeSite(s,d.fc[i],d.aq&&d.aq[i],w,nowIso); if(!r) return null; decorate(r,ephemFor(w.base),activeShowers(w.base)); return {deep:r.deep,score:r.score}; }));
+    st.heat={ts:Date.now(),M,wins};
+    $('heatInfo').textContent='已更新 '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+  }catch(e){ $('heatInfo').textContent='⚠️ 没取到（'+(e.status===429?'额度用完了':'网络问题')+'）'; }
+  st.heatLoading=false; $('heatBtn').textContent='重新加载'; renderHeat();
+}
+function renderHeat(){
+  const h=st.heat; if(!h){ $('heatBox').innerHTML=''; return; }
+  const idx=SITES.map((s,i)=>i).filter(i=>st.region==='全部'||SITES[i].region===st.region);
+  const mx=i=>Math.max(0,...h.M[i].map(c=>c?c.deep:0));
+  idx.sort((a,b)=>mx(b)-mx(a));
+  const show=idx.slice(0,st.heatAll?99:18);
+  let t='<table class="heat"><tr><th></th>'+h.wins.map((w,o)=>`<th style="${o>=8?'opacity:.6':''}">${+w.base.slice(8)}<br>${moonEmoji(ephemFor(w.base).moonAge)}</th>`).join('')+'</tr>';
+  show.forEach(i=>{ t+=`<tr><td class="n" data-hs="${i}" style="cursor:pointer">${SITES[i].name.slice(0,9)}</td>`+h.M[i].map((c,o)=>`<td class="c" style="background:${c?heatColor(c.deep):'#1b2440'};${o>=8?'opacity:.6':''}">${c?c.deep:''}</td>`).join('')+'</tr>'; });
+  t+='</table>';
+  // 全国最佳之夜
+  const bestN=h.wins.slice(0,10).map((w,o)=>{ let b=null; SITES.forEach((s,i)=>{ const c=h.M[i][o]; if(c&&(!b||c.deep>b.c.deep)) b={s,c}; }); return b&&{o,b,w}; }).filter(Boolean).sort((a,b)=>b.b.c.deep-a.b.c.deep).slice(0,3);
+  $('heatBox').innerHTML=`<div class="kv"><b>🏆 全国最佳之夜</b><span>${bestN.map(x=>`${x.w.base.slice(5).replace('-','/')} ${x.b.s.name} 深空${x.b.c.deep}`).join('<br>')}</span></div><div class="heatwrap">${t}</div><div class="bar"><button class="btn" id="heatMore">${st.heatAll?'收起':'显示全部'}</button><span class="tg" style="margin:0">格子=深空指数（天气×天黑×月光）· 点地名切到该点 · 日期下面是月相</span></div>`;
+}
+
+// ===================== 调度 =====================
+const TABS=['tonight','map','sky','long'];
+function renderTab(){
+  if(st.tab==='tonight') renderTonight();
+  else if(st.tab==='map'){ renderMapTab(); if(st.raw&&window._lastOut==null) renderTonight(); }
+  else if(st.tab==='sky') renderSkyTab();
+  else renderLongTab();
+  const {win,now}=curWin(st.day); const E=ephemFor(win.base);
+  if(st.tab!=='tonight'){ const ill=Math.round(E.ill*100); $('moon').textContent=`${win.base.slice(5).replace('-','/')} 夜 · ${moonEmoji(E.moonAge)} 月亮≈${ill}%`; }
+}
+function showTab(t){
+  st.tab=t; TABS.forEach(x=>{ $('tab-'+x).style.display=(x===t)?'block':'none'; });
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  if(t==='map') initMap();
+  if(t!=='tonight'&&!st.spotData&&!st.spotLoading) ensureSpot();
+  renderTab(); window.scrollTo(0,0);
+}
+
+// ===================== 交互（事件委托）=====================
+document.addEventListener('click',e=>{
+  const T=e.target;
+  let el;
+  if((el=T.closest('#tabs button'))) return showTab(el.dataset.t);
+  if((el=T.closest('[data-go]'))) return showTab(el.dataset.go);
+  if((el=T.closest('#daySeg button'))){ st.day=+el.dataset.d; document.querySelectorAll('#daySeg button').forEach(c=>c.classList.toggle('on',c===el)); st.ctx=null; return renderTab(); }
+  if((el=T.closest('.chip[data-r]'))){ st.region=el.dataset.r; renderChips(); return st.tab==='long'?renderHeat():renderTonight(); }
+  if((el=T.closest('.chip[data-ot]'))){ st.objType=el.dataset.ot; st.objLimit=30; return renderSkyTab(); }
+  if((el=T.closest('[data-pin]'))){ const id=el.dataset.pin; st.pins=st.pins.includes(id)?st.pins.filter(x=>x!==id):[...st.pins,id]; try{ localStorage.setItem('hoshi-pins',JSON.stringify(st.pins)); }catch(_){} return renderSkyTab(); }
+  if(T.closest('#moreObj')){ st.objLimit+=30; return renderSkyTab(); }
+  if(T.closest('#heatMore')){ st.heatAll=!st.heatAll; return renderHeat(); }
+  if((el=T.closest('[data-hs]'))){ setSpot(SITES[+el.dataset.hs]); return showTab('long'); }
+  if((el=T.closest('.t3[data-site]'))||(el=T.closest('.note[data-site]'))){ const s=SITES[+el.dataset.site]; placePin(s.lat,s.lon); setSpot(s); return showTab(st.tab==='tonight'?'sky':st.tab); }
+  if((el=T.closest('[data-r]'))&&st.chartRows){ const k=el.getAttribute('data-r'); const c=st.chartRows; let s;
+    if(k==='w'){ s=c.res?`天气：${c.res.score}分 · 晴率${c.res.pclear}% · 地形云风险最高${c.res.maxRisk}%（${pad(c.res.peakHour)}点）。黄色虚线框=黄金观测时段。`:'天气未加载'; }
+    else s=objInfo(c.rows[+k].o,c.ctx);
+    $('rowInfo').textContent=s; return; }
+  if((el=T.closest('.lr[data-o]'))){ const off=el.dataset.o, box=$('lx'+off); if(box.innerHTML){ box.innerHTML=''; } else { const r=st.longRes[off]; if(r) box.innerHTML=card(r).replace('class="card"','class="card open"'); } return; }
+  if((el=T.closest('.hd'))&&el.parentElement.classList.contains('card')){ el.parentElement.classList.toggle('open'); return; }
+});
+$('sort').onchange=e=>{ st.sort=e.target.value; renderTonight(); };
+$('refresh').onclick=()=>refresh(true);
+$('locBtn').onclick=locate;
+$('q').oninput=e=>{ st.q=e.target.value.trim(); st.objLimit=30; $('objList').innerHTML=objectItems(skyCtx()); };
+$('objSort').onchange=e=>{ st.objSort=e.target.value; $('objList').innerHTML=objectItems(skyCtx()); };
+$('onlyVis').onchange=e=>{ st.onlyVis=e.target.checked; $('objList').innerHTML=objectItems(skyCtx()); };
+$('heatBtn').onclick=loadHeat;
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&Date.now()-st.ts>20*60*1000) refresh(true); });
+setInterval(()=>{ if(!document.hidden) refresh(true); },REFRESH_MS);
+renderChips();
+refresh(false);
+
+</script>
+</body>
+</html>
